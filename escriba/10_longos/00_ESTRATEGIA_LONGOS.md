@@ -180,10 +180,14 @@ Ex.: L01 → "A letra quebrada que pode ser o nome de Davi" (Mesa) + "A fortalez
 |---|---|
 | Agora | Criar o canal + subir V01 e V02 como Shorts |
 | Semana de 16/11 | Aprovar o roteiro do L01 → narração → teste do Relevo |
-| **Semana de 23/11** | **L01 "O caso Davi"** |
-| **~05 a 10/12** | **L02 "O Natal que a Bíblia conta"** (a busca sobe em dezembro) |
-| **Início de janeiro** | **L03 "Ezequias × Assíria"** (início de ano, época de plano de leitura, ligado ao Rolo) |
-| Depois | 1 longo a cada 2 semanas. Se a produção aguentar, semanal a partir do 6º |
+| **~22/11** | **L01 "O caso Davi"** |
+| **~06/12** | **L02 "O Natal que a Bíblia conta"** (a busca sobe em dezembro) |
+| **~20/12** | **L06 "10 coisas que todo mundo acha que estão na Bíblia"** (leve, formato de lista, reaproveita o V02; nas festas tem mais gente em casa) |
+| **~03/01** | **L03 "Ezequias × Assíria"** (início de ano, época de plano de leitura, ligado ao Rolo) |
+| **~17/01** | **L04 Pilatos** |
+| **A partir de fevereiro** | **Semanal**, se L01 a L03 mostrarem que o sistema de produção aguenta (a Tabuleta e a biblioteca de placas de Relevo são reaproveitáveis, então cada episódio fica mais rápido que o anterior) |
+
+**Ritmo:** **2 longos por mês** desde o início, sem buracos, mais os Shorts de sempre (2 a 3 por semana). Começa quinzenal porque o primeiro longo também constrói o sistema (Relevo, Tabuleta, camada Documento). Ser mais rápido do que isso agora custaria rigor e qualidade, que são o diferencial.
 
 O YouTube distribui o longo ao longo de dias e semanas, não de horas como o Reel. O horário de postagem importa menos. Vamos testar.
 

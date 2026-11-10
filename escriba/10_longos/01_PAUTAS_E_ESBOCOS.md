@@ -28,6 +28,8 @@ Cada longo precisa passar em 4 filtros:
 | L09 | Ciro: o rei estrangeiro que a Bíblia chama de "ungido" | Impérios | Cilindro de Ciro; Is 45:1 | V09 | Baixo |
 | L10 | O Êxodo aconteceu? O que dá para dizer (e o que não dá) | Debaixo da Terra | Busca enorme | — | **Alto**: pouca evidência direta; deixar para quando o canal já tiver credibilidade |
 
+**Ordem de publicação** (a cada 2 semanas): L01 (~22/11) → L02 (~06/12) → **L06** (~20/12, leve, para não deixar buraco nas festas) → L03 (~03/01) → L04 (~17/01) → semanal a partir de fevereiro, se a produção aguentar.
+
 **Regra de mistura:** nunca 2 longos "difíceis" (L07, L10) seguidos. Depois de um tema polêmico, vem um tema de achado forte.
 
 ---
