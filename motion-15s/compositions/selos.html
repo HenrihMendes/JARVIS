@@ -1,0 +1,180 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "Archivo";
+      font-style: normal;
+      font-weight: 800;
+      src: url("assets/fonts/archivo-latin-800-normal.woff2") format("woff2");
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+    @font-face {
+      font-family: "Archivo";
+      font-style: normal;
+      font-weight: 800;
+      src: url("assets/fonts/archivo-latin-ext-800-normal.woff2") format("woff2");
+      unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+    }
+    @font-face {
+      font-family: "IBM Plex Mono";
+      font-style: normal;
+      font-weight: 600;
+      src: url("assets/fonts/ibm-plex-mono-latin-600-normal.woff2") format("woff2");
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+    #root {
+      position: absolute;
+      inset: 0;
+      --papiro: #f1e6d2;
+      --papiro-2: #c9beaa;
+      --carvao: #1b1714;
+    }
+    #selos-olho {
+      position: absolute;
+      left: 0;
+      top: 330px;
+      width: 1080px;
+      text-align: center;
+      font-family: "IBM Plex Mono", monospace;
+      font-weight: 600;
+      font-size: 30px;
+      letter-spacing: 0.16em;
+      color: var(--papiro-2);
+    }
+    #selos-grade {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1080px;
+      height: 1920px;
+    }
+    .selos-sombra {
+      position: absolute;
+      width: 300px;
+      height: 70px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse at center, rgba(10, 12, 24, 0.55) 0%, rgba(10, 12, 24, 0) 70%);
+    }
+    .selos-selo {
+      position: absolute;
+      width: 280px;
+      height: 280px;
+    }
+    .selos-selo img {
+      display: block;
+      width: 280px;
+      height: 280px;
+    }
+    .selos-desc {
+      position: absolute;
+      width: 380px;
+      text-align: center;
+      font-family: "Archivo", sans-serif;
+      font-weight: 800;
+      font-size: 40px;
+      line-height: 1.15;
+      color: var(--papiro);
+    }
+  </style>
+
+  <div
+    id="root"
+    data-composition-id="selos"
+    data-width="1080"
+    data-height="1920"
+    data-composition-variables='[
+      {"id":"desc_texto","type":"string","label":"Descritor TEXTO","default":"O que a Bíblia diz"},
+      {"id":"desc_achado","type":"string","label":"Descritor ACHADO","default":"O que a arqueologia achou"},
+      {"id":"desc_leitura","type":"string","label":"Descritor LEITURA","default":"O que é interpretação"},
+      {"id":"desc_recriacao","type":"string","label":"Descritor RECRIAÇÃO","default":"O que a animação imagina"}
+    ]'
+  >
+    <div id="selos-olho">OS 4 SELOS DA ESCRIBA</div>
+
+    <div id="selos-grade">
+      <!-- TEXTO -->
+      <div id="selos-sombra-1" class="selos-sombra" style="left: 160px; top: 676px"></div>
+      <div id="selos-s1" class="selos-selo" style="left: 170px; top: 430px">
+        <img src="assets/brand/selo-texto.svg" alt="Selo TEXTO" />
+      </div>
+      <div id="selos-d1" class="selos-desc" style="left: 120px; top: 736px" data-var-text="desc_texto">O que a Bíblia diz</div>
+
+      <!-- ACHADO -->
+      <div id="selos-sombra-2" class="selos-sombra" style="left: 620px; top: 676px"></div>
+      <div id="selos-s2" class="selos-selo" style="left: 630px; top: 430px">
+        <img src="assets/brand/selo-achado.svg" alt="Selo ACHADO" />
+      </div>
+      <div id="selos-d2" class="selos-desc" style="left: 580px; top: 736px" data-var-text="desc_achado">O que a arqueologia achou</div>
+
+      <!-- LEITURA -->
+      <div id="selos-sombra-3" class="selos-sombra" style="left: 160px; top: 1106px"></div>
+      <div id="selos-s3" class="selos-selo" style="left: 170px; top: 860px">
+        <img src="assets/brand/selo-leitura.svg" alt="Selo LEITURA" />
+      </div>
+      <div id="selos-d3" class="selos-desc" style="left: 120px; top: 1166px" data-var-text="desc_leitura">O que é interpretação</div>
+
+      <!-- RECRIAÇÃO -->
+      <div id="selos-sombra-4" class="selos-sombra" style="left: 620px; top: 1106px"></div>
+      <div id="selos-s4" class="selos-selo" style="left: 630px; top: 860px">
+        <img src="assets/brand/selo-recriacao.svg" alt="Selo RECRIAÇÃO" />
+      </div>
+      <div id="selos-d4" class="selos-desc" style="left: 580px; top: 1166px" data-var-text="desc_recriacao">O que a animação imagina</div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      const batidas = [0.2, 1.4, 2.6, 3.8]; // início de cada carimbo (local)
+      const PRESS = 0.16;
+
+      // Rótulo: a linha inteira entra com blur 8 -> 0.
+      tl.fromTo("#selos-olho", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power2.out" }, 0.05);
+
+      for (let i = 1; i <= 4; i++) {
+        const t = batidas[i - 1];
+        const s = "#selos-s" + i;
+        // Pressão: o selo cai acelerando até o contato...
+        tl.fromTo(
+          s,
+          { opacity: 0, scale: 1.6, y: -40, filter: "blur(10px)", transformOrigin: "50% 50%" },
+          { opacity: 1, scale: 0.94, y: 0, filter: "blur(0px)", duration: PRESS, ease: "power3.in" },
+          t,
+        );
+        // ...e assenta na argila (mola ~0,75).
+        tl.to(s, { scale: 1, duration: 0.24, ease: "back.out(1.6)" }, t + PRESS);
+        // Sombra de contato aparece no impacto.
+        tl.fromTo("#selos-sombra-" + i, { opacity: 0, scaleX: 0.6 }, { opacity: 1, scaleX: 1, duration: 0.2, ease: "power2.out" }, t + PRESS - 0.02);
+        // Recuo da mesa com o impacto.
+        tl.fromTo("#selos-grade", { y: 0 }, { y: 4, duration: 0.04, ease: "power2.out", immediateRender: false }, t + PRESS);
+        tl.to("#selos-grade", { y: 0, duration: 0.18, ease: "power2.out" }, t + PRESS + 0.04);
+        // Descritor: de cinza claro para tinta, sem mudar de posição.
+        tl.fromTo(
+          "#selos-d" + i,
+          { opacity: 0, filter: "blur(6px)" },
+          { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power2.out" },
+          t + PRESS + 0.08,
+        );
+      }
+
+      // Saída dos textos (6,35 s local = 10,15 s absoluto).
+      tl.to(["#selos-olho", ".selos-desc"], { opacity: 0, filter: "blur(8px)", duration: 0.18, ease: "power2.in", stagger: 0.02 }, 6.35);
+      tl.to(".selos-sombra", { opacity: 0, duration: 0.2, ease: "power2.in" }, 6.4);
+
+      // Os 4 selos convergem para o centro e viram a bulla da marca (passa para a cena final).
+      const destinos = [
+        { x: 230, y: 90 },
+        { x: -230, y: 90 },
+        { x: 230, y: -340 },
+        { x: -230, y: -340 },
+      ];
+      destinos.forEach(function (d, k) {
+        const s = "#selos-s" + (k + 1);
+        tl.to(s, { x: d.x, y: d.y, scale: 0.6, duration: 0.45, ease: "power3.in" }, 6.5);
+        tl.to(s, { filter: "blur(6px)", duration: 0.3, ease: "power2.in" }, 6.6);
+        tl.to(s, { opacity: 0, duration: 0.07, ease: "power2.in" }, 6.98);
+      });
+
+      window.__timelines["selos"] = tl;
+    })();
+  </script>
+</template>

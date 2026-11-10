@@ -1,0 +1,101 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "Fraunces";
+      font-style: normal;
+      font-weight: 900;
+      src: url("assets/fonts/fraunces-latin-900-normal.woff2") format("woff2");
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+    @font-face {
+      font-family: "Fraunces";
+      font-style: normal;
+      font-weight: 900;
+      src: url("assets/fonts/fraunces-latin-ext-900-normal.woff2") format("woff2");
+      unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+    }
+    #root {
+      position: absolute;
+      inset: 0;
+      --papiro: #f1e6d2;
+      --lamparina: #e2a43a;
+    }
+    #gancho-titulo {
+      position: absolute;
+      left: 60px;
+      top: 500px;
+      width: 960px;
+      text-align: center;
+      font-family: "Fraunces", serif;
+      font-weight: 900;
+      font-size: 112px;
+      line-height: 1.02;
+      letter-spacing: -0.01em;
+      color: var(--papiro);
+    }
+    #gancho-titulo .gancho-l {
+      display: block;
+    }
+    #gancho-titulo .gancho-w {
+      display: inline-block;
+    }
+    #gancho-chave {
+      color: var(--lamparina);
+    }
+    /* "é Bíblia." começa escondido; o timeline carimba em 0,45 s */
+    #gancho-titulo .gancho-b {
+      opacity: 0;
+    }
+  </style>
+
+  <div
+    id="root"
+    data-composition-id="gancho"
+    data-width="1080"
+    data-height="1920"
+  >
+    <h1 id="gancho-titulo">
+      <span class="gancho-l"
+        ><span class="gancho-w">Nem</span> <span class="gancho-w">tudo</span> <span class="gancho-w">que</span></span
+      >
+      <span class="gancho-l"
+        ><span class="gancho-w">você</span> <span class="gancho-w">vê</span> <span class="gancho-w">num</span></span
+      >
+      <span class="gancho-l"><span class="gancho-w">vídeo</span> <span class="gancho-w">bíblico</span></span>
+      <span class="gancho-l"
+        ><span id="gancho-e" class="gancho-w gancho-b">é</span>
+        <span id="gancho-chave" class="gancho-w gancho-b">Bíblia.</span></span
+      >
+    </h1>
+  </div>
+
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      const palavras = gsap.utils.toArray("#gancho-titulo .gancho-w");
+
+      // Frame 0: as três primeiras linhas já estão na tela (thumbnail + gancho).
+
+      // 0,45 s: "é Bíblia." é carimbado: acelera até o contato, assenta com mola amortecida.
+      tl.fromTo(
+        ".gancho-b",
+        { opacity: 0, scale: 1.35, filter: "blur(8px)", transformOrigin: "50% 60%" },
+        { opacity: 1, scale: 0.96, filter: "blur(0px)", duration: 0.17, ease: "power3.in" },
+        0.45,
+      );
+      tl.to(".gancho-b", { scale: 1, duration: 0.26, ease: "back.out(1.7)" }, 0.62);
+      // O bloco recua 4 px com o impacto e volta.
+      tl.fromTo("#gancho-titulo", { y: 0 }, { y: 5, duration: 0.05, ease: "power2.out" }, 0.62);
+      tl.to("#gancho-titulo", { y: 0, duration: 0.22, ease: "power2.out" }, 0.67);
+
+      // Saída: palavra a palavra, blur + fade (3,40–3,80 s).
+      tl.to(
+        palavras,
+        { opacity: 0, filter: "blur(8px)", duration: 0.18, ease: "power2.in", stagger: 0.02 },
+        3.42,
+      );
+
+      window.__timelines["gancho"] = tl;
+    })();
+  </script>
+</template>

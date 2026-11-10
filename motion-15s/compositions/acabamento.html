@@ -1,0 +1,57 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    /* Vinheta: bordas puxadas para o azul-noite, como na correção de cor da marca. */
+    #acab-vinheta {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1080px;
+      height: 1920px;
+      background: radial-gradient(ellipse 75% 62% at 50% 46%, rgba(14, 20, 40, 0) 60%, rgba(14, 20, 40, 0.55) 100%);
+    }
+    /* Grão de filme (componente grain-overlay do registro), trocado por GSAP a 12 fps para ser determinístico. */
+    #acab-grao {
+      position: absolute;
+      left: -540px;
+      top: -960px;
+      width: 2160px;
+      height: 3840px;
+      opacity: 0.06;
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    }
+  </style>
+
+  <div id="root" data-composition-id="acabamento" data-width="1080" data-height="1920">
+    <div id="acab-vinheta" data-layout-ignore></div>
+    <div id="acab-grao" data-layout-ignore></div>
+  </div>
+
+  <script>
+    (function () {
+      function rng(seed) {
+        return function () {
+          seed |= 0;
+          seed = (seed + 0x6d2b79f5) | 0;
+          let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+          t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+      const r = rng(3);
+      const tl = gsap.timeline({ paused: true });
+      const passos = 15 * 12;
+      for (let i = 0; i < passos; i++) {
+        tl.set("#acab-grao", { x: Math.round((r() - 0.5) * 400), y: Math.round((r() - 0.5) * 400) }, i / 12);
+      }
+      // âncora de duração para o timeline cobrir os 15 s
+      tl.to({}, { duration: 15 }, 0);
+      window.__timelines["acabamento"] = tl;
+    })();
+  </script>
+</template>
