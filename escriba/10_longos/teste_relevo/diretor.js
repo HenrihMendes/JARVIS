@@ -63,7 +63,7 @@ async function clipeQuadro(p, clip) {
   const chaves = (p.cam || [{ t: 0, z: 1, x: 0.5, y: 0.5 }, { t: p.dur, z: 1.08, x: 0.5, y: 0.5 }]).map(c => { const f = c.foco !== undefined ? meta.focos[c.foco] : [c.x ?? 0.5, c.y ?? 0.5]; return { t: c.t, z: c.z ?? 1, x: f[0], y: f[1] }; });
   // fonte com >= 7680 px de largura: o erro de arredondamento do zoompan fica abaixo de 1/4 de pixel na saída (sem tremido)
   const larg = JSON.parse(execFileSync('ffprobe', ['-v', 'error', '-select_streams', 'v', '-show_entries', 'stream=width', '-of', 'json', fp]).toString()).streams[0].width;
-  let src = fp; if (larg < 7680) { src = path.join(OUT, 'tmp', p.id + '_8k.png'); if (!fs.existsSync(src)) ff(['-i', fp, '-vf', 'scale=7680:-1:flags=lanczos', src]); }
+  let src = fp; if (larg < 7680) { src = path.join(OUT, 'tmp', p.id + '_8k.png'); if (!fs.existsSync(src) || fs.statSync(src).mtimeMs < fs.statSync(fp).mtimeMs) ff(['-i', fp, '-vf', 'scale=7680:-1:flags=lanczos', src]); }
   const T = `(on/${FPS}-${p.head})`;
   const Z = expr(chaves, 'z', T), X = expr(chaves, 'x', T), Y = expr(chaves, 'y', T);
   const zp = `zoompan=z='${Z}':x='clip((${X})*iw-iw/zoom/2,0,iw-iw/zoom)':y='clip((${Y})*ih-ih/zoom/2,0,ih-ih/zoom)':d=${p.n}:s=${W}x${H}:fps=${FPS}`;

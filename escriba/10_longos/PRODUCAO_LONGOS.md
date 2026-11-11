@@ -5,6 +5,7 @@
 > ⚠️ **`ESCRIBA_BRAND_BIBLE.md` não está em nenhum branch do repositório.** A 2ª sessão não conseguiu lê-lo. Se ele existe, precisa ser commitado aqui ou anexado à sessão.
 
 ## 1. Decisões do fundador (✅)
+- **Comunicação:** respostas curtas e diretas. Explicar só problema real ou quando ele pedir. Perguntar quando for preciso decidir.
 - **Formato:** YouTube 16:9, **8 a 10 min**, 24 fps.
 - **Narração:** a da abertura do L01 foi aprovada ("ficou perfeita, na medida certa"). Ela usa:
   - voz Nassif (`acdKA5HckGxoxxvy40dA`), `eleven_v4`;
@@ -75,9 +76,7 @@
   - 6 planos "anim" (30,7 s de vídeo): **~20 min**, cerca de 40 s de render por segundo de vídeo;
   - 5 planos "quadro" (21,4 s de vídeo): **~36 s** no total, cerca de 1,7 s de render por segundo de vídeo.
 - **Estimativa corrigida para 10 min com ~15% de animação:** ~1 h a 1h15. É bem menos que as 6 a 7 h, mas mais que os 45 min estimados antes, porque a animação domina o tempo.
-- **Pendente:**
-  - P08 (as 3 provas na mesa) espera as fotos. O Wikimedia bloqueia o download (429, "robot policy") porque a ferramenta não se identifica com um contato. O fundador precisa autorizar o contato a usar.
-  - Sem as fotos, a prévia saiu com um aviso no lugar do P08 (`out/L01_cap0_v2_previa_abertura.mp4`).
+- ✅ **Cap. 0 v2 completo** em `teste_relevo/out/L01_cap0_v2_abertura.mp4` (fora do Git). A testemunha 1 agora mostra a estela de Tel Dan. Fotos: rodar `baixar.sh` com `WIKI_UA` (contato do canal; pedir ao fundador).
 - **Comandos:**
   - render: `node diretor.js planos/L01_cap0.json` (retomável), ou `node diretor.js planos/L01_cap0.json P08` para um plano só;
   - montagem: `VIDEO=out_v2/cap0/video.mp4 SUF=_v2 ./montar_cap0.sh`.
