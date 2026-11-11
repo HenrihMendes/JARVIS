@@ -110,7 +110,7 @@ Mais nomes confundem o público. O que identifica o longo é **o carimbo do tít
 ### 2.4 O que muda nas regras da marca (pede o seu OK)
 | Regra atual | Proposta para o longo | Por quê |
 |---|---|---|
-| ✅ "@escribatv + símbolo o vídeo todo" | **Mantida**, menor (símbolo de 48 px + @ em mono 22 px, opacidade 80%, canto superior direito) | Regra sua: não mudo sem você. Só ajusto o tamanho ao 16:9 |
+| ✅ "@escribatv.oficial + símbolo o vídeo todo" | **Mantida**, menor (símbolo de 48 px + @ em mono 22 px, opacidade 80%, canto superior direito) | Regra sua: não mudo sem você. Só ajusto o tamanho ao 16:9 |
 | ☑️ Legenda queimada palavra por palavra | **Legenda em .srt** (o espectador liga e desliga). Na tela ficam só cartões e palavras-chave | Em 10 minutos, a legenda pulando cansa e tapa o cenário. O .srt também permite tradução automática (espanhol no futuro) |
 | ☑️ Título-gancho nos primeiros 3,5 s | **Abertura fria de ~45 s**, depois o carimbo do título | No longo, o gancho é a história, não o letreiro |
 | ☑️ 17 planos em média | **~110 a 140 planos**, média de 4 a 6 s | O ritmo pode respirar um pouco mais que no Short |
@@ -166,7 +166,7 @@ O ganho real não está no render, está na **construção**: no 3D, cada cenár
 ## 5. Canal e distribuição 🟡
 
 ### 5.1 Um canal só
-- **Canal "Escriba" (@escribatv) no YouTube**, com Shorts e longos juntos. Para canal pequeno, dividir em dois canais divide a força. (A Brand Bible lista o canal como "em criação": **ele precisa existir antes do L01.**)
+- **Canal "Escriba" (@escribatv.oficial) no YouTube**, com Shorts e longos juntos. Para canal pequeno, dividir em dois canais divide a força. (A Brand Bible lista o canal como "em criação": **ele precisa existir antes do L01.**)
 - Subir **V01 e V02 como Shorts no YouTube** já, para o canal ter vida antes do primeiro longo.
 - **Link de "vídeo relacionado"**: cada Short aponta para o longo do mesmo tema. É um recurso do YouTube Studio para Shorts ([Search Engine Land](https://searchengineland.com/youtube-enables-linking-shorts-long-form-videos-430655), [vidIQ](https://vidiq.com/blog/post/youtube-related-links-connect-shorts-long-videos)). Ele manda poucos espectadores, segundo um guia de set/2026 ([OutlierKit](https://outlierkit.com/resources/youtube-shorts-to-long-form/)), então reforce com o comentário fixado.
 - **Instagram:** o Reel continua sendo o motor de alcance. Na legenda: "a história completa, com as 4 provas, está no YouTube" + link na bio. Não tente postar o longo no Instagram.

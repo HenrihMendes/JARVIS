@@ -12,7 +12,7 @@ Teste da camada **B · Relevo** (Estratégia dos Longos, seção 3) aplicado a u
   - paisagem, palácio, oficina, estela com o texto em aramaico antigo, mapa em papiro, placa do título.
 - `teste.html`: o "diretor", com a lista de planos e as funções `renderAt(T)`.
 - `render.js`: captura os quadros com o Playwright e o Chromium (swiftshader).
-- `overlay.html` e `overlay.js`: a camada gráfica 16:9 (série, selos, etiqueta, @escribatv, cartão *bytdwd*).
+- `overlay.html` e `overlay.js`: a camada gráfica 16:9 (série, selos, etiqueta, @escribatv.oficial, cartão *bytdwd*).
 - `audio.py`: trilha e efeitos sintetizados (drone, cordas, coro, trompas, oud em Ré Hijaz, daf, cinzel, carimbo, silêncio antes da revelação).
 - `montar.sh`: mixagem com *ducking* e montagem final (cor, grão, vinheta, camada gráfica).
 

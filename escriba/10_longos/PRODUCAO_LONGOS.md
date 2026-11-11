@@ -33,7 +33,7 @@
 | Motor 3D | `lib/barro.js` | Personagem paramétrico, objetos, objetos que se desfazem. **`setLowpoly(true)`** liga o estilo facetado |
 | Abertura do L01 | `cap0.html` | 18 planos. `?lp=1` = low poly |
 | Render | `render.js` | `PAGE=cap0.html QS=lp=1 node render.js <pasta> <t0> <t1> 1` (pula quadros prontos) |
-| Camada gráfica | `overlay.js` + `overlay_cap0.html` | Selos, contador "TESTEMUNHA n/4", créditos de foto, @escribatv |
+| Camada gráfica | `overlay.js` + `overlay_cap0.html` | Selos, contador "TESTEMUNHA n/4", créditos de foto, @escribatv.oficial |
 | Trilha | `audio_cap0.py` | Sintetizada (drone, cordas, coro, oud em Ré Hijaz, daf, efeitos) |
 | Montagem | `montar_cap0.sh` | Voz com ganho linear (sem loudnorm dinâmico) → mix → cor/grão/vinheta → mp4 |
 

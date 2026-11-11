@@ -348,7 +348,7 @@ window.renderAt = async (T) => {
 };
 // v2 (diretor.js): qualquer plano, em qualquer instante, fora da linha do tempo antiga
 const CATALOGO = Object.fromEntries(SHOTS.map(s => [s.id, s.build]));
-Object.assign(CATALOGO, { C06t: shotMesa('tres'), C13e: shotMesa('tabEncara'), C09f: shotFotosMesa(['tel_dan_portao.jpg', 'estela_mesa_louvre.jpg', 'lista_sisaque.jpg']) });
+Object.assign(CATALOGO, { C06t: shotMesa('tres'), C13e: shotMesa('tabEncara'), C09f: shotFotosMesa(['estela_tel_dan.jpg', 'estela_mesa_louvre.jpg', 'lista_sisaque.jpg']) });
 window.renderShot = async (id, t, u) => {
   if (atualId !== id) { if (atual && atual.sc !== undefined) dispose(atual.sc); atual = await CATALOGO[id](); atualId = id; }
   atual.update(t, u); if (atual.dof) { rp.scene = atual.sc; bokeh.scene = atual.sc; composer.render(); } else renderer.render(atual.sc, camera);
