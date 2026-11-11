@@ -17,8 +17,10 @@ Entrega: `renders/escriba-4-selos-15s.mp4` · 1080×1920 · 30 fps · 15,0 s · 
 ## Desvios das regras da marca (conscientes, a decidir)
 1. **Sem narração.** Regra 6 pede a voz Nassif em todos os vídeos. Num motion de 15 s sem pedido de voz, deixei sem.
    Dá para adicionar pelo ElevenLabs (voz `acdKA5HckGxoxxvy40dA`) se a vinheta for virar abertura de vídeo.
-2. **Sem trilha.** Foi pedida trilha livre, mas o catálogo gratuito exige login na HeyGen (`npx hyperframes auth login`),
-   que não foi feito. Só há efeitos sonoros (Pixabay, uso comercial liberado).
+2. **Trilha do catálogo HeyGen, não a trilha original da marca.** O Brand Bible pede trilha original sintetizada
+   (drone em Ré, oud em Hijaz de Ré, daf). Usei a faixa do catálogo mais próxima disso: "Hijaz, oud/santur, daf,
+   tensa→confiante", 100 BPM (`assets/bgm/CREDITS.md`). Não conferi se ela está em Ré nem se é a mesma escala exata.
+   Confira os termos de uso comercial da HeyGen para o seu plano antes de monetizar.
 3. **Sem pergunta de comentário** (regra 7). Em 15 s ela roubaria o tempo de leitura do cartão final.
 4. **@escribatv em 28 px** (o manual diz 27 px): 28 px é o piso de leitura em celular que o check exige.
 5. **2D vetorial, não o 3D de argila do motor V01/V02.** O carimbo e a bulla são planos; fica abaixo do acabamento dos episódios.
@@ -34,8 +36,11 @@ Entrega: `renders/escriba-4-selos-15s.mp4` · 1080×1920 · 30 fps · 15,0 s · 
   - havia um quadro vazio no corte selos → bulla (10,8 s);
   - sobravam 0,35 s parados antes do 1º selo.
 - Áudio do MP4 **medido, não ouvido**:
-  - −14,8 LUFS integrado, pico real −4,3 dBTP, sem clipping;
-  - impactos em 0,63 / 4,17 / 5,39 / 6,57 / 7,79 / 11,36 / 12,97 s, colados na imagem (no máximo 1,5 quadro de atraso).
+  - −16,1 LUFS integrado, pico real −1,5 dBTP, sem clipping;
+  - a trilha entra em 7,85 s da faixa: os 4 selos e o "é Bíblia." caem em batidas;
+  - o silêncio da faixa (18,4–19,1 s) cai logo antes do carimbo final; tirei o riser para não preencher esse silêncio;
+  - cada impacto fica 6 a 15 dB acima da trilha; o carimbo final sai de −40 dB para −8 dB;
+  - o "pop" do CTA (12,9 s) fica abafado pela trilha que volta; deixei assim.
 
 ## Plano mais fraco
 O carimbo de madeira (11,0–12,1 s). Visto de cima e em 2D ele funciona, mas não tem o peso do carimbo 3D dos episódios.
