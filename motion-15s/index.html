@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>Escriba · Os 4 Selos (15 s)</title>
+    <script src="assets/vendor/gsap.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #1d2a4d;
+      }
+      #root {
+        position: relative;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #1d2a4d;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="15"
+      data-width="1080"
+      data-height="1920"
+    >
+      <!-- Mundo: parede lápis-lazúli, lamparina de argila, poeira na luz -->
+      <div
+        id="fundo"
+        data-composition-id="fundo"
+        data-composition-src="compositions/fundo.html"
+        data-start="0"
+        data-duration="15"
+        data-track-index="0"
+        data-track-kind="graphics"
+        data-width="1080"
+        data-height="1920"
+        style="z-index: 1"
+      ></div>
+
+      <!-- Cena 1: gancho -->
+      <div
+        id="gancho"
+        data-composition-id="gancho"
+        data-composition-src="compositions/gancho.html"
+        data-start="0"
+        data-duration="3.9"
+        data-track-index="1"
+        data-track-kind="graphics"
+        data-width="1080"
+        data-height="1920"
+        style="z-index: 2"
+      ></div>
+
+      <!-- Cena 2: os 4 selos -->
+      <div
+        id="selos"
+        data-composition-id="selos"
+        data-composition-src="compositions/selos.html"
+        data-start="3.8"
+        data-duration="7.1"
+        data-track-index="2"
+        data-track-kind="graphics"
+        data-width="1080"
+        data-height="1920"
+        style="z-index: 3"
+      ></div>
+
+      <!-- Cena 3: carimbo, assinatura, lema e CTA -->
+      <div
+        id="final"
+        data-composition-id="final"
+        data-composition-src="compositions/final.html"
+        data-start="10.8"
+        data-duration="4.2"
+        data-track-index="3"
+        data-track-kind="graphics"
+        data-width="1080"
+        data-height="1920"
+        style="z-index: 4"
+      ></div>
+
+      <!-- Camada fixa da marca: @escribatv + símbolo + barra de progresso (o vídeo todo) -->
+      <div
+        id="marca"
+        data-composition-id="marca"
+        data-composition-src="compositions/marca.html"
+        data-start="0"
+        data-duration="15"
+        data-track-index="4"
+        data-track-kind="graphics"
+        data-width="1080"
+        data-height="1920"
+        style="z-index: 5"
+      ></div>
+
+      <!-- Acabamento: grão de filme + vinheta -->
+      <div
+        id="acabamento"
+        data-composition-id="acabamento"
+        data-composition-src="compositions/acabamento.html"
+        data-start="0"
+        data-duration="15"
+        data-track-index="5"
+        data-track-kind="graphics"
+        data-width="1080"
+        data-height="1920"
+        style="z-index: 6"
+      ></div>
+
+      <!-- Trilha: catálogo HeyGen (Hijaz + daf, 100 BPM). Começa em 7,85 s da faixa: os carimbos caem nas batidas
+           e o silêncio da faixa (18,4–19,1 s) cai antes do impacto do carimbo final (11,35 s). -->
+      <audio id="bgm" class="clip" src="assets/bgm/escriba-hijaz-daf.mp3" data-start="0" data-duration="15" data-media-start="7.85" data-volume="0.5" data-fade-in="0.12" data-fade-out="0.6" data-track-index="9"></audio>
+
+      <!-- Efeitos (Pixabay Content License). Picos alinhados 1 quadro depois da imagem. -->
+      <audio id="sfx-gancho" class="clip" src="assets/sfx/impact-bass-1.mp3" data-start="0.58" data-duration="1.2" data-volume="0.32" data-fade-out="0.5" data-track-index="10"></audio>
+      <audio id="sfx-whoosh-1" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="3.5" data-duration="0.57" data-volume="0.44" data-track-index="11"></audio>
+      <audio id="sfx-selo-1" class="clip" src="assets/sfx/impact-bass-1.mp3" data-start="4.12" data-duration="0.9" data-volume="0.224" data-fade-out="0.4" data-track-index="12"></audio>
+      <audio id="sfx-selo-2" class="clip" src="assets/sfx/impact-bass-2.mp3" data-start="5.37" data-duration="0.7" data-volume="0.176" data-fade-out="0.35" data-track-index="13"></audio>
+      <audio id="sfx-selo-3" class="clip" src="assets/sfx/impact-bass-1.mp3" data-start="6.52" data-duration="0.9" data-volume="0.224" data-fade-out="0.4" data-track-index="12"></audio>
+      <audio id="sfx-selo-4" class="clip" src="assets/sfx/impact-bass-2.mp3" data-start="7.77" data-duration="0.7" data-volume="0.176" data-fade-out="0.35" data-track-index="13"></audio>
+      <audio id="sfx-whoosh-2" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="10.5" data-duration="0.57" data-volume="0.4" data-track-index="11"></audio>
+      <audio id="sfx-carimbo" class="clip" src="assets/sfx/impact-bass-1.mp3" data-start="11.31" data-duration="2.1" data-volume="0.6" data-fade-out="0.8" data-track-index="15"></audio>
+      <audio id="sfx-cta" class="clip" src="assets/sfx/pop.mp3" data-start="12.85" data-duration="0.7" data-volume="0.48" data-track-index="16"></audio>
+    </div>
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+    </script>
+  </body>
+</html>

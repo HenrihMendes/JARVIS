@@ -1,0 +1,168 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: #1d2a4d;
+    }
+    #fundo-parede {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1080px;
+      height: 1920px;
+      background: linear-gradient(180deg, #141d36 0%, #1a2645 30%, #1d2a4d 55%, #1d2a4d 100%);
+    }
+    #fundo-reboco {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1080px;
+      height: 1920px;
+      opacity: 0.09;
+      mix-blend-mode: soft-light;
+    }
+    #fundo-luz {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1080px;
+      height: 1920px;
+      background: radial-gradient(
+        circle at 540px 1560px,
+        rgba(255, 179, 92, 0.34) 0px,
+        rgba(226, 164, 58, 0.16) 380px,
+        rgba(122, 58, 30, 0.06) 720px,
+        rgba(29, 42, 77, 0) 1050px
+      );
+    }
+    #fundo-lamparina {
+      position: absolute;
+      left: 100px;
+      top: 1450px;
+      width: 500px;
+      height: 300px;
+      overflow: visible;
+    }
+    .fundo-poeira {
+      position: absolute;
+      border-radius: 50%;
+      background: #ffbf7a;
+    }
+  </style>
+
+  <div id="root" data-composition-id="fundo" data-width="1080" data-height="1920">
+    <div id="fundo-parede"></div>
+
+    <svg id="fundo-reboco" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg" data-layout-ignore>
+      <filter id="fundo-ruido" x="0" y="0" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.011 0.018" numOctaves="4" seed="7" />
+        <feColorMatrix type="saturate" values="0" />
+      </filter>
+      <rect width="1080" height="1920" filter="url(#fundo-ruido)" />
+    </svg>
+
+    <div id="fundo-luz"></div>
+
+    <!-- Lamparina de argila (fonte visível da luz). O bico fica em x=540. -->
+    <svg id="fundo-lamparina" viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg" data-layout-ignore>
+      <defs>
+        <linearGradient id="fundo-barro" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#4a2010" />
+          <stop offset="0.55" stop-color="#7a3a1e" />
+          <stop offset="1" stop-color="#b5532c" />
+        </linearGradient>
+        <linearGradient id="fundo-topo" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#6a2e16" />
+          <stop offset="1" stop-color="#c86a3c" />
+        </linearGradient>
+        <linearGradient id="fundo-fogo" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0" stop-color="#fff1c9" />
+          <stop offset="0.35" stop-color="#ffbf7a" />
+          <stop offset="0.8" stop-color="#e2a43a" />
+          <stop offset="1" stop-color="#e2a43a" stop-opacity="0" />
+        </linearGradient>
+        <radialGradient id="fundo-halo" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0" stop-color="#ffb35c" stop-opacity="0.55" />
+          <stop offset="1" stop-color="#ffb35c" stop-opacity="0" />
+        </radialGradient>
+      </defs>
+      <ellipse id="fundo-halo-chama" cx="440" cy="115" rx="120" ry="120" fill="url(#fundo-halo)" />
+      <!-- pé -->
+      <ellipse cx="220" cy="256" rx="78" ry="13" fill="#3a1a0c" />
+      <!-- corpo -->
+      <path d="M70,205 C70,150 150,140 230,140 C290,140 330,150 360,160 L430,152 C452,150 466,162 462,176 C458,190 444,194 430,192 L356,200 C330,232 290,250 220,250 C130,250 70,240 70,205 Z" fill="url(#fundo-barro)" />
+      <!-- face de cima, pegando a luz da chama -->
+      <path d="M96,188 C110,160 170,152 230,152 C290,152 328,160 352,170 C320,182 280,188 220,188 C160,188 120,190 96,188 Z" fill="url(#fundo-topo)" opacity="0.9" />
+      <!-- furo de enchimento -->
+      <ellipse cx="214" cy="172" rx="28" ry="9" fill="#2a1208" />
+      <!-- alça -->
+      <path d="M78,196 C46,192 34,170 46,158 C56,148 74,156 82,170" fill="none" stroke="#5a2814" stroke-width="12" stroke-linecap="round" />
+      <!-- bico e pavio -->
+      <ellipse cx="440" cy="166" rx="14" ry="6" fill="#2a1208" />
+      <!-- chama -->
+      <g id="fundo-chama">
+        <path d="M440,168 C410,158 416,110 440,46 C464,110 470,158 440,168 Z" fill="url(#fundo-fogo)" />
+        <path d="M440,164 C428,158 430,132 440,104 C450,132 452,158 440,164 Z" fill="#fff6dc" opacity="0.85" />
+      </g>
+    </svg>
+
+    <!-- Poeira subindo no calor da chama (posições com semente fixa) -->
+    <div id="fundo-poeira" data-layout-ignore></div>
+  </div>
+
+  <script>
+    (function () {
+      // PRNG determinístico (mulberry32)
+      function rng(seed) {
+        return function () {
+          seed |= 0;
+          seed = (seed + 0x6d2b79f5) | 0;
+          let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+          t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+      const r = rng(7);
+      const D = 15;
+      const tl = gsap.timeline({ paused: true });
+
+      // Chama viva: 30 ciclos de 0,5 s, valores de semente fixa
+      gsap.set("#fundo-chama", { svgOrigin: "440 168" });
+      for (let i = 0; i < 30; i++) {
+        tl.to(
+          "#fundo-chama",
+          { scaleY: 0.9 + 0.2 * r(), scaleX: 0.94 + 0.1 * r(), skewX: -5 + 10 * r(), duration: 0.5, ease: "sine.inOut" },
+          i * 0.5,
+        );
+        tl.to("#fundo-luz", { opacity: 0.88 + 0.12 * r(), duration: 0.5, ease: "sine.inOut" }, i * 0.5);
+        tl.to("#fundo-halo-chama", { opacity: 0.75 + 0.25 * r(), duration: 0.5, ease: "sine.inOut" }, i * 0.5);
+      }
+
+      // Poeira: 16 grãos no cone de luz acima da chama
+      const host = document.getElementById("fundo-poeira");
+      for (let i = 0; i < 16; i++) {
+        const d = document.createElement("div");
+        d.className = "fundo-poeira";
+        d.id = "fundo-p" + i;
+        const size = 3 + Math.round(r() * 4);
+        const x = 540 + (r() - 0.5) * 640;
+        const y = 820 + r() * 700;
+        d.style.width = size + "px";
+        d.style.height = size + "px";
+        d.style.left = Math.round(x) + "px";
+        d.style.top = Math.round(y) + "px";
+        host.appendChild(d);
+        const rise = 260 + r() * 160;
+        const sway = (r() - 0.5) * 60;
+        const peak = 0.25 + r() * 0.35;
+        tl.fromTo(d, { x: 0, y: 0 }, { x: sway, y: -rise, duration: D, ease: "none" }, 0);
+        tl.fromTo(d, { opacity: 0 }, { opacity: peak, duration: 2 + r() * 2, ease: "sine.inOut" }, r() * 3);
+        tl.to(d, { opacity: 0, duration: 2.5, ease: "sine.inOut" }, 9 + r() * 3.5);
+      }
+
+      window.__timelines["fundo"] = tl;
+    })();
+  </script>
+</template>
