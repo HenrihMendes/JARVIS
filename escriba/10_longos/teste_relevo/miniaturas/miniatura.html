@@ -1,0 +1,36 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Escriba — miniatura</title>
+<style>
+@font-face{font-family:"Fraunces";font-weight:900;src:url(../node_modules/@fontsource/fraunces/files/fraunces-latin-900-normal.woff2) format("woff2");}
+@font-face{font-family:"Archivo";font-weight:800;src:url(../node_modules/@fontsource/archivo/files/archivo-latin-800-normal.woff2) format("woff2");}
+:root{--lapis:#1D2A4D;--barro:#B5532C;--papiro:#F1E6D2;--lamp:#E2A43A}
+html,body{margin:0;width:1280px;height:720px;overflow:hidden;background:#0b1124}
+.bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:contrast(1.12) saturate(1.15)}
+.sombra{position:absolute;inset:0}
+.txt{position:absolute;font-family:"Fraunces";font-weight:900;color:var(--papiro);line-height:.9;text-shadow:0 6px 0 rgba(0,0,0,.35),0 0 40px rgba(0,0,0,.6)}
+.txt em{font-style:normal;color:var(--lamp)}
+.selo{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border-radius:50%;background:var(--barro);color:var(--papiro);
+  font:800 26px/1.05 "Archivo";letter-spacing:.06em;box-shadow:0 8px 24px rgba(0,0,0,.5),inset 0 0 0 6px rgba(241,230,210,.85);transform:rotate(-10deg)}
+.marca{position:absolute;right:28px;bottom:22px;font:800 22px "Archivo";letter-spacing:.18em;color:var(--papiro);opacity:.9;text-shadow:0 2px 8px rgba(0,0,0,.8)}
+</style></head><body>
+<div class="bg" id="bg"></div><div class="sombra" id="sombra"></div>
+<div class="txt" id="txt"></div><div class="selo" id="selo"></div><div class="marca">O CASO DAVI</div>
+<script>
+const V = {
+  // A: a prova real (foto da estela de Tel Dan) + pergunta direta
+  a: { bg: 'bg_estela.jpg', pos: '70% 40%', sombra: 'linear-gradient(90deg,rgba(8,12,26,.96) 0%,rgba(8,12,26,.85) 38%,rgba(8,12,26,0) 70%)',
+       txt: 'DAVI<br><em>EXISTIU?</em>', css: 'left:56px;top:150px;font-size:168px', selo: '<b style="font-size:64px">4</b><br>TESTEMUNHAS', scss: 'left:500px;top:455px;width:210px;height:210px;font-size:16px' },
+  // B: a cena do gancho (low poly) + "lenda?"
+  b: { bg: 'bg_gancho.png', pos: '50% 50%', sombra: 'linear-gradient(0deg,rgba(8,12,26,.9) 0%,rgba(8,12,26,.2) 45%,rgba(8,12,26,0) 70%)',
+       txt: 'LENDA<em>?</em>', css: 'left:50%;bottom:70px;transform:translateX(-50%);font-size:210px', selo: 'A PEDRA<br>DO<br>INIMIGO', scss: 'left:60px;top:60px;width:190px;height:190px' },
+  // C: o Escriba encara + o "descarte"
+  c: { bg: 'bg_escriba.png', pos: '0% 28%', size: '140%', sombra: 'linear-gradient(90deg,rgba(8,12,26,.95) 0%,rgba(8,12,26,.75) 40%,rgba(8,12,26,0) 66%)',
+       txt: 'UMA<br>FOI<br><em>DESCARTADA</em>', css: 'left:52px;top:150px;font-size:108px', selo: 'O CASO<br>DAVI', scss: 'display:none' },
+};
+const v = V[new URLSearchParams(location.search).get('v') || 'a'];
+document.getElementById('bg').style.cssText = `background-image:url(../out/miniaturas/${v.bg});background-position:${v.pos};background-size:${v.size || 'cover'}`;
+document.getElementById('sombra').style.background = v.sombra;
+const t = document.getElementById('txt'); t.innerHTML = v.txt; t.style.cssText += v.css;
+const s = document.getElementById('selo'); s.innerHTML = v.selo; s.style.cssText += v.scss;
+document.fonts.ready.then(() => window.ready = true);
+</script></body></html>
