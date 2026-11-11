@@ -11,3 +11,5 @@ overlay.ffconcat
 *.mp4
 frames0/
 prev0/
+overlay0/
+overlay_cap0.ffconcat
