@@ -136,15 +136,18 @@ Mais nomes confundem o público. O que identifica o longo é **o carimbo do tít
 - crédito na tela + na descrição;
 - **não usar** fotos de museu com "©" sem autorização. Em uma busca vi fotos da estela de Tel Dan com crédito "© The Israel Museum", ou seja, nem toda foto circulando é livre.
 
-**Estimativa de render do L01** (estimativa, não medição):
-| Camada | Tempo de tela | Render estimado |
-|---|---|---|
-| Barro | ~2 min (boa parte reaproveitando cenários do V01) | ~1h30 |
-| Relevo | ~4,5 min | ~30 a 40 min |
-| Documento | ~3,5 min | ~10 min |
-| **Total** | ~11 min | **~2h30**, contra ~7h+ se fosse todo 3D |
+**Render do L01: estimativa corrigida pelo teste de 11/11/2026**
 
-O ganho maior não é o render, é a **construção**: no 3D, cada cenário novo custa várias rodadas de prévia e correção. **Reaproveitar cenários-mestre** é a maior economia de todas.
+O teste de 35 s em Relevo levou **~25 min** com 2 processos (~0,57 quadro/s; `teste_relevo/LEIA-ME.md`). Por quadro, isso é **parecido com o 3D**: a sombra calculada no relevo custa caro. A estimativa anterior, de ~2h30 para o longo inteiro, estava **otimista**.
+
+| Camada | Tempo de tela | Render medido/estimado |
+|---|---|---|
+| Barro (3D) | ~2 min | ~1h30 (reaproveitando cenários do V01) |
+| Relevo | ~4,5 min | ~3h hoje → **~1h30** se cortar o custo da sombra pela metade (otimização pendente) |
+| Documento | ~3,5 min | ~30 min (o mapa é a cena mais rápida do teste) |
+| **Total** | ~11 min | **~3h30 a 5h de render**, que roda sozinho em segundo plano |
+
+O ganho real não está no render, está na **construção**: no 3D, cada cenário novo custa várias rodadas de prévia e correção. **Reaproveitar cenários-mestre** é a maior economia de todas.
 
 ⚠️ **O Relevo ainda não existe.** Antes do L01 inteiro, proponho um **teste de 30 s** (seção 8). Se não ficar no padrão "estúdio" ✅, a gente ajusta ou volta mais 3D.
 

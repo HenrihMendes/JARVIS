@@ -1,0 +1,249 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Escriba — teste Relevo</title>
+<style>
+@font-face{font-family:"Fraunces";font-weight:900;src:url(node_modules/@fontsource/fraunces/files/fraunces-latin-900-normal.woff2) format("woff2");}
+@font-face{font-family:"Fraunces";font-weight:700;src:url(node_modules/@fontsource/fraunces/files/fraunces-latin-700-normal.woff2) format("woff2");}
+@font-face{font-family:"Fraunces";font-weight:400;font-style:italic;src:url(node_modules/@fontsource/fraunces/files/fraunces-latin-400-italic.woff2) format("woff2");}
+@font-face{font-family:"Fraunces";font-weight:700;src:url(node_modules/@fontsource/fraunces/files/fraunces-latin-ext-700-normal.woff2) format("woff2");unicode-range:U+0100-024F,U+1E00-1EFF;}
+@font-face{font-family:"IBM Plex Mono";font-weight:600;src:url(node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-600-normal.woff2) format("woff2");}
+@font-face{font-family:"Noto Sans Phoenician";font-weight:400;src:url(node_modules/@fontsource/noto-sans-phoenician/files/noto-sans-phoenician-phoenician-400-normal.woff2) format("woff2");}
+html,body{margin:0;background:#000;overflow:hidden}
+</style>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+</head><body><canvas id="c"></canvas>
+<script type="module">
+import * as THREE from 'three';
+import { Layer, Mask, plate, heightTexture, colorTexture, lightAll, particles, flame, flick, setRenderer, ease, easeInOut, lerp, clamp, rng, ceu } from './lib/relevo.js';
+import { figura, bracoMartelo, carro, paisagem, paredePalacio, paredeOficina, estela, estelaLayout, mapa, placaTitulo, faixaRosetas, curve, line, ell, poly, smooth } from './lib/arte.js';
+
+const Q = new URLSearchParams(location.search); const SCALE = parseFloat(Q.get('s') || '1');
+const W = Math.round(1920 * SCALE), H = Math.round(1080 * SCALE);
+const canvas = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1); renderer.setSize(W, H, false); renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
+renderer.outputColorSpace = THREE.SRGBColorSpace; setRenderer(renderer);
+const camera = new THREE.PerspectiveCamera(32, 16 / 9, 0.05, 200);
+const V3 = (x, y, z) => new THREE.Vector3(x, y, z); const C = (r, g, b) => new THREE.Color(r, g, b);
+const place = (m, x0, y0, z) => { const g = m.geometry.parameters; m.position.set(x0 + g.width / 2, y0 + g.height / 2, z); return m; };
+const PPU = (v) => Math.max(20, Math.round(v * Math.max(SCALE, 0.35)));
+function cam(p0, p1, l0, l1, u, fov) { camera.position.lerpVectors(p0, p1, u); const l = new THREE.Vector3().lerpVectors(l0, l1, u); camera.lookAt(l); if (fov) { camera.fov = fov; camera.updateProjectionMatrix(); } }
+const twos = (t) => Math.floor(t * 12) / 12;
+
+// ---------------- SHOTS (tempos do vídeo; narração começa em 0,8 s) ----------------
+const SHOTS = [
+  { id: 'S1', ini: 0.0, fim: 8.05, build: S1 },
+  { id: 'S2', ini: 8.05, fim: 12.65, build: S2 },
+  { id: 'S3', ini: 12.65, fim: 17.6, build: S3 },
+  { id: 'S4', ini: 17.6, fim: 21.85, build: S4 },
+  { id: 'S5a', ini: 21.85, fim: 27.3, build: S5a },
+  { id: 'S5b', ini: 27.3, fim: 31.4, build: S5b },
+  { id: 'S6', ini: 31.4, fim: 35.4, build: S6 },
+];
+window.SHOTS = SHOTS.map(s => ({ id: s.id, ini: s.ini, fim: s.fim })); window.DUR = 35.4;
+
+// ---------- S1 · A MARCHA ----------
+function S1() {
+  const sc = new THREE.Scene(); sc.background = new THREE.Color(0x0a1022);
+  const Lbg = paisagem(PPU(70), 40, 11, 5); const bg = plate(Lbg, heightTexture(Lbg, { noiseAmp: 0.05, alphaFromH: 0.08 }), { hScale: 0.4, colLow: 0x141a2e, colHigh: 0x3a4568, shadowLen: 3, detRep: 0.5 });
+  place(bg, -8, -2.5, -5.5); sc.add(bg);
+  const ppu = PPU(190); const F = new Layer(20, 5.9, ppu);
+  F.raise(c => c.fillRect(0, 0, 20, 1.32), 0.3, 3);
+  F.incise(c => { c.lineWidth = 0.02; for (let k = 0; k < 5; k++) { const pts = []; for (let x = 0; x <= 20; x += 0.25) pts.push([x, 0.5 + k * 0.17 + Math.sin(x * 3 + k) * 0.02]); curve(c, pts); } }, 0.22, 1);
+  const gy = 1.26;
+  const vA = [1, 2, 3].map(k => figura(ppu, { s: 1, b: 0.7, cabeca: 'elmo', barba: 'curta', arma: k === 2 ? 'escudo' : 'lanca', seed: 10 + k }));
+  for (let i = 0, x = 0.1; x < 19.5; i++, x += 0.6) F.stamp(vA[i % 3], x + 0.28, gy + 0.08);
+  const vF = { S: figura(ppu, { s: 1, cabeca: 'elmo', barba: 'curta', arma: 'lanca', seed: 1 }), S2: figura(ppu, { s: 1, cabeca: 'elmo', barba: 'curta', arma: 'lanca', seed: 2 }), A: figura(ppu, { s: 1, cabeca: 'elmo', barba: 'curta', arma: 'arco', seed: 3 }), E: figura(ppu, { s: 1, cabeca: 'elmo', barba: 'curta', arma: 'escudo', seed: 4 }), C: carro(ppu, { s: 1 }) };
+  const seq = 'SSASCS2ESSACS2SESACSS'.match(/S2|[SACE]/g); let x = 0.0;
+  for (const k of seq) { if (k === 'C') { F.stamp(vF.C, x - 0.2, gy - 0.02); x += 3.05; } else { F.stamp(vF[k], x, gy); x += 0.64; } }
+  const mid = plate(F, heightTexture(F, { noiseAmp: 0.025, alphaFromH: 0.04 }), { hScale: 0.15, shadowLen: 1.6 }); place(mid, -1, -1.3, 0); sc.add(mid);
+  const sky = ceu({ w: 90, h: 34, horY: 0.56, glowAmt: 1.5, hor: 0x3a2a3e, mid: 0x1d2a4d, top: 0x070b1a }); sky.position.set(6, 3, -12); sc.add(sky);
+  const pó = particles({ n: 600, box: [14, 5, 5], center: [6.5, 1.6, 1.2], color: 0xffc890, size: 0.022, opacity: 0.55, seed: 4 }); sc.add(pó);
+  const brasas = particles({ n: 90, box: [14, 4, 3], center: [6.5, 1.0, 1.3], color: 0xff7a30, size: 0.03, rise: 0.35, opacity: 0.8, seed: 8 }); sc.add(brasas);
+  return { sc, update(t, u) {
+    const k = easeInOut(u); const cx = lerp(4.6, 8.4, k);
+    cam(V3(4.6, 0.85, 7.6), V3(8.4, 1.05, 6.8), V3(4.9, 1.85, 0), V3(8.6, 1.95, 0), k, 32);
+    const f = flick(t, 1);
+    lightAll(sc, { L1: { p: V3(cx - 3.2 + 2.0 * k, 3.3, 1.5), c: C(1.0, 0.58, 0.28).multiplyScalar(3.0 * f), r: 4.2 },
+      L2: { p: V3(cx + 5.5, 4.6, 1.2), c: C(0.22, 0.3, 0.62).multiplyScalar(1.7), r: 8 },
+      D: { d: V3(-0.3, 0.6, 1), c: C(0.05, 0.07, 0.14) }, ambTop: C(0.03, 0.04, 0.085), ambBot: C(0.02, 0.014, 0.01), fog: { c: C(0.055, 0.075, 0.15), n: 8, f: 24 } });
+    pó.userData.update(t); brasas.userData.update(t); sky.userData.update(t);
+  } };
+}
+
+// ---------- S2 · O REI ----------
+function S2() {
+  const sc = new THREE.Scene(); sc.background = new THREE.Color(0x0a0f20);
+  const Lw = paredePalacio(PPU(110), 16, 8.5); const wall = plate(Lw, heightTexture(Lw, { noiseAmp: 0.04 }), { hScale: 0.25, colLow: 0x161c30, colHigh: 0x3a4466, shadowLen: 2 }); place(wall, -5, -1.2, -1.8); sc.add(wall);
+  const ppu = PPU(240); const M = new Layer(8, 6.4, ppu);
+  M.raise(c => c.fillRect(0, 0, 8, 0.75), 0.32, 3); faixaRosetas(M, 0.18, 0.62, 0.3, 0.44);
+  M.stamp(figura(ppu, { s: 2.0, b: 0.72, cabeca: 'gorro', barba: 'curta', arma: 'estandarte', armadura: false, seed: 31 }), 0.65, 0.68);
+  M.stamp(figura(ppu, { s: 2.3, roupa: 'longa', cabeca: 'coroa', barba: 'longa', arma: 'cetro', seed: 32 }), 2.35, 0.66);
+  const mid = plate(M, heightTexture(M, { noiseAmp: 0.02, alphaFromH: 0.04 }), { hScale: 0.2, shadowLen: 1.4 }); place(mid, -0.5, -0.6, 0); sc.add(mid);
+  // tocha à direita
+  const Lt = new Layer(1.2, 4, PPU(120)); Lt.raise(c => { c.fillRect(0.5, 0, 0.2, 3.2); poly(c, [[0.25, 3.1], [0.95, 3.1], [0.8, 3.5], [0.4, 3.5]]); }, 0.7, 4);
+  const torch = plate(Lt, heightTexture(Lt, { alphaFromH: 0.1 }), { hScale: 0.15, colLow: 0x22140c, colHigh: 0x4a2c18 }); place(torch, 5.1, -0.6, 1.0); sc.add(torch);
+  const fl = flame({ w: 0.55, h: 1.1, seed: 2 }); fl.position.set(5.7, 3.42, 1.05); sc.add(fl);
+  const brasas = particles({ n: 120, box: [1.4, 4.5, 0.8], center: [5.7, 5.0, 1.1], color: 0xff8a3a, size: 0.035, rise: 0.6, drift: 0.15, opacity: 0.9, seed: 9 }); sc.add(brasas);
+  const pó = particles({ n: 400, box: [8, 6, 3], center: [3.4, 2.6, 1.2], color: 0xffd0a0, size: 0.02, opacity: 0.4, seed: 5 }); sc.add(pó);
+  return { sc, update(t, u) {
+    const k = easeInOut(u);
+    cam(V3(4.4, 0.9, 7.4), V3(4.0, 2.4, 4.4), V3(3.75, 2.75, 0), V3(3.55, 3.55, 0), k, 34);
+    const f = flick(t, 3);
+    lightAll(sc, { L1: { p: V3(5.7, 3.5, 1.35), c: C(1.0, 0.56, 0.24).multiplyScalar(3.4 * f), r: 4.0 },
+      L2: { p: V3(-1.5, 6.5, 1.6), c: C(0.25, 0.34, 0.7).multiplyScalar(1.5), r: 7 },
+      D: { d: V3(0.2, 0.3, 1), c: C(0.04, 0.05, 0.1) }, ambTop: C(0.025, 0.03, 0.07), ambBot: C(0.02, 0.012, 0.008), fog: { c: C(0.05, 0.065, 0.13), n: 7, f: 20 } });
+    fl.userData.update(t); brasas.userData.update(t); pó.userData.update(t);
+  } };
+}
+
+// ---------- S3 · O MAPA (camada Documento, papiro iluminado) ----------
+function S3() {
+  const sc = new THREE.Scene(); sc.background = new THREE.Color(0x0b1124);
+  const m = mapa(PPU(250));
+  const tex = heightTexture(m.L, { noiseAmp: 0.08, noiseScale: 6, extra: m.ordem });
+  const p = plate(m.L, tex, { hScale: 0.03, colTex: colorTexture(m.cor), inkTex: colorTexture(m.tinta), shadowLen: 0.5, spec: 0.02, sheen: 0.15, detAmp: 0.001 }); place(p, 0, 0, 0); sc.add(p);
+  const pó = particles({ n: 300, box: [8, 4.5, 2], center: [4, 2.2, 1.0], color: 0xffd6a0, size: 0.018, opacity: 0.45, seed: 12 }); sc.add(pó);
+  return { sc, update(t, u) {
+    const k = easeInOut(u);
+    cam(V3(4.6, 2.1, 5.6), V3(4.1, 1.85, 4.6), V3(4.55, 2.35, 0), V3(4.0, 2.0, 0), k, 40);
+    const T = 12.65 + t; const rv = T < 12.9 ? 0 : T < 14.7 ? lerp(0, 0.84, ease((T - 12.9) / 1.8)) : T < 15.5 ? 0.84 : lerp(0.84, 0.95, ease((T - 15.5) / 0.4));
+    p.material.uniforms.reveal.value = rv;
+    const f = flick(t, 5);
+    lightAll(sc, { L1: { p: V3(lerp(1.5, 5.5, k), 3.8, 1.6), c: C(1.0, 0.7, 0.42).multiplyScalar(2.2 * f), r: 4.5 },
+      L2: { p: V3(8.5, 0.5, 2.0), c: C(0.25, 0.32, 0.6).multiplyScalar(0.8), r: 6 },
+      D: { d: V3(0, 0, 1), c: C(0.06, 0.06, 0.08) }, ambTop: C(0.04, 0.04, 0.06), ambBot: C(0.03, 0.025, 0.02), fog: { c: C(0.05, 0.07, 0.14), n: 50, f: 90 } });
+    pó.userData.update(t);
+  } };
+}
+
+// ---------- S4 · O ESCULTOR ----------
+const BATIDAS = [17.95, 18.6, 19.25, 19.9, 20.55, 21.2];
+function S4() {
+  const sc = new THREE.Scene(); sc.background = new THREE.Color(0x0a0f20);
+  const Lw = paredeOficina(PPU(100), 14, 7.5, 2, [4.9, 5.2]); const wall = plate(Lw, heightTexture(Lw, { noiseAmp: 0.05 }), { hScale: 0.25, colLow: 0x161c30, colHigh: 0x3a4466, shadowLen: 2 }); place(wall, -4, -1.2, -1.6); sc.add(wall);
+  const ppu = PPU(230); const M = new Layer(8, 5.4, ppu);
+  M.raise(c => c.fillRect(0, 0, 8, 0.7), 0.3, 3);
+  const est = estela(ppu, { w: 2.1, hgt: 3.3, seed: 5 }); M.stamp(est.L, 4.3, 0.62);
+  M.raise(c => c.fillRect(4.15, 0.6, 2.4, 0.12), 0.85, 2);
+  const esc = figura(ppu, { s: 1.8, cabeca: 'gorro', barba: 'curta', arma: 'cinzel', armadura: false, passo: 0.7, seed: 41 }); M.stamp(esc, 2.55, 0.62);
+  const mid = plate(M, heightTexture(M, { noiseAmp: 0.02, alphaFromH: 0.04 }), { hScale: 0.18, shadowLen: 1.4 }); place(mid, 0, -0.6, 0); sc.add(mid);
+  const bm = bracoMartelo(ppu, 1.8); const arm = plate(bm.L, heightTexture(bm.L, { alphaFromH: 0.06, noiseAmp: 0 }), { hScale: 0.18, shadowLen: 0.8 });
+  const pivot = new THREE.Group(); const shX = 2.55 + (0.55 + 0.05) * 1.8, shY = -0.6 + 0.62 + (0.05 + 1.29) * 1.8; pivot.position.set(shX, shY, 0.03);
+  arm.position.set(bm.L.w / 2 - bm.pivot[0], bm.L.h / 2 - bm.pivot[1], 0); pivot.add(arm); sc.add(pivot);
+  // faíscas
+  const NF = 40, fpos = new Float32Array(NF * BATIDAS.length * 3); const fg = new THREE.BufferGeometry(); fg.setAttribute('position', new THREE.BufferAttribute(fpos, 3));
+  const fs = new THREE.Points(fg, new THREE.PointsMaterial({ color: 0xffc070, size: 0.035, transparent: true, opacity: 1, blending: THREE.AdditiveBlending, depthWrite: false })); sc.add(fs);
+  const r = rng(77); const dirs = []; for (let i = 0; i < NF * BATIDAS.length; i++) dirs.push([0.3 + r() * 1.4, (r() - 0.3) * 1.6, r() * 1.2, r()]);
+  const tipX = 2.55 + (0.55 + 0.56) * 1.8, tipY = -0.6 + 0.62 + (0.05 + 1.26) * 1.8;
+  const flN = flame({ w: 0.3, h: 0.6, seed: 4 }); flN.position.set(0.9, 4.0, -1.2); sc.add(flN);
+  const pó = particles({ n: 450, box: [8, 5, 3], center: [3.6, 2.2, 1.0], color: 0xffd0a0, size: 0.02, opacity: 0.45, seed: 15 }); sc.add(pó);
+  return { sc, update(t, u) {
+    const T = 17.6 + t, k = easeInOut(u);
+    cam(V3(3.6, 2.0, 6.6), V3(4.6, 2.3, 5.6), V3(3.9, 2.25, 0), V3(4.7, 2.35, 0), k, 34);
+    // martelo: sobe devagar, desce rápido na batida
+    let a = -0.55; for (const b of BATIDAS) { const d = twos(T) - b; if (d > -0.5 && d < 0.15) { a = d < 0 ? lerp(-0.55, 0.25, Math.pow((d + 0.5) / 0.5, 3)) : lerp(0.25, -0.1, d / 0.15); } }
+    pivot.rotation.z = a;
+    let i = 0; for (let bi = 0; bi < BATIDAS.length; bi++) { const d = T - BATIDAS[bi]; for (let j = 0; j < NF; j++, i++) { const v = dirs[i]; const ok = d > 0 && d < 0.5 + v[3] * 0.3;
+        fpos[i * 3] = ok ? tipX + v[0] * d * 0.9 : 0; fpos[i * 3 + 1] = ok ? tipY + v[1] * d * 0.9 - 2.5 * d * d : -99; fpos[i * 3 + 2] = ok ? 0.25 + v[2] * d : 0; } }
+    fg.attributes.position.needsUpdate = true;
+    const hit = BATIDAS.reduce((m, b) => { const d = T - b; return d >= 0 && d < 0.12 ? Math.max(m, 1 - d / 0.12) : m; }, 0);
+    const f = flick(t, 7);
+    lightAll(sc, { L1: { p: V3(1.1, 4.1, 1.4), c: C(1.0, 0.58, 0.28).multiplyScalar(2.8 * f), r: 4.6 },
+      L2: { p: V3(tipX + 0.15, tipY, 0.5), c: C(1.0, 0.75, 0.4).multiplyScalar(1.4 * hit), r: 0.9 },
+      D: { d: V3(0.6, 0.6, 1), c: C(0.06, 0.08, 0.16) }, ambTop: C(0.03, 0.035, 0.075), ambBot: C(0.02, 0.014, 0.01), fog: { c: C(0.05, 0.065, 0.13), n: 7, f: 20 } });
+    flN.userData.update(t); pó.userData.update(t);
+  } };
+}
+
+// ---------- S5a · A ESTELA ----------
+const BASALTO = { colLow: 0x141418, colHigh: 0x36363e, colVar: 0.3, spec: 0.2, sheen: 0.3 };
+function S5a() {
+  const sc = new THREE.Scene(); sc.background = new THREE.Color(0x070b18);
+  const Lw = paredeOficina(PPU(60), 14, 9, 7); const wall = plate(Lw, heightTexture(Lw, { noiseAmp: 0.05 }), { hScale: 0.25, colLow: 0x0e1222, colHigh: 0x262e48 }); place(wall, -5.5, -2, -2.5); sc.add(wall);
+  const e = estela(PPU(430), { w: 3.0, hgt: 4.6 }); const tex = heightTexture(e.L, { noiseAmp: 0.03, noiseScale: 5, extra: e.em, extraBlur: 6, alpha: e.al });
+  const p = plate(e.L, tex, { hScale: 0.09, shadowLen: 0.6, ...BASALTO, detAmp: 0.004, detRep: 1.6 }); place(p, 0, 0, 0); sc.add(p);
+  const base = new Layer(4.2, 0.6, PPU(120)); base.raise(c => smooth(c, [[0, 0], [4.2, 0], [4.0, 0.55], [0.2, 0.55]]), 0.7, 6);
+  const bp = plate(base, heightTexture(base, { alphaFromH: 0.1 }), { hScale: 0.2, colLow: 0x22160e, colHigh: 0x4a3020 }); place(bp, -0.6, -0.45, 0.05); sc.add(bp);
+  const pó = particles({ n: 500, box: [5, 6, 3], center: [1.5, 2.4, 1.2], color: 0xffd6a8, size: 0.016, opacity: 0.5, seed: 21 }); sc.add(pó);
+  return { sc, update(t, u) {
+    const k = easeInOut(u);
+    cam(V3(1.45, 0.7, 7.4), V3(1.6, 2.55, 4.9), V3(1.5, 1.9, 0), V3(1.6, 2.75, 0), k, 34);
+    const f = flick(t, 9);
+    lightAll(sc, { L1: { p: V3(lerp(-1.0, -0.4, k), lerp(2.0, 3.4, k), 0.8), c: C(1.0, 0.58, 0.28).multiplyScalar(3.6 * f), r: 3.2 },
+      L2: { p: V3(4.8, 5.5, 1.5), c: C(0.25, 0.34, 0.72).multiplyScalar(0.7), r: 7 },
+      D: { d: V3(0.3, 0.5, 1), c: C(0.05, 0.065, 0.13) }, ambTop: C(0.03, 0.035, 0.075), ambBot: C(0.015, 0.012, 0.01), fog: { c: C(0.04, 0.055, 0.11), n: 7, f: 18 } });
+    pó.userData.update(t);
+  } };
+}
+
+// ---------- S5b · A PALAVRA (macro; acende em "Casa de Davi") ----------
+const ACENDE = 28.79;
+function S5b() {
+  const sc = new THREE.Scene(); sc.background = new THREE.Color(0x05080f);
+  const lay = estelaLayout(3.0, 4.6); const cx = lay.caixa; const mx = (cx[0] + cx[2]) / 2, my = (cx[1] + cx[3]) / 2;
+  const R = [mx - 1.05, my - 0.42, mx + 1.25, my + 0.48];
+  const e = estela(PPU(1400), { w: 3.0, hgt: 4.6, regiao: R }); const tex = heightTexture(e.L, { noiseAmp: 0.02, noiseScale: 3, extra: e.em, extraBlur: 14, halo: 0.35, smooth: 3 });
+  const p = plate(e.L, tex, { hScale: 0.09, shadowLen: 0.35, ...BASALTO, detAmp: 0.0015, detRep: 4 }); p.material.uniforms.emisC.value.setRGB(1.0, 0.42, 0.1); place(p, R[0], R[1], 0); sc.add(p);
+  const pó = particles({ n: 260, box: [2.4, 1.2, 1.2], center: [mx, my, 0.5], color: 0xffd6a8, size: 0.006, opacity: 0.6, seed: 31 }); sc.add(pó);
+  return { sc, update(t, u) {
+    const T = 27.3 + t, k = easeInOut(u);
+    cam(V3(mx + 0.55, my - 0.12, 2.3), V3(mx + 0.12, my - 0.04, 1.35), V3(mx + 0.35, my, 0), V3(mx + 0.02, my + 0.01, 0), k, 32);
+    const g = T < ACENDE ? 0 : clamp((T - ACENDE) / 0.45, 0, 1); const pulse = g * (1.7 + 0.15 * Math.sin((T - ACENDE) * 5));
+    p.material.uniforms.emisA.value = pulse * (T < ACENDE + 0.2 ? (0.6 + 0.4 * Math.sin((T - ACENDE) * 60)) : 1);
+    const lampOn = T < 27.7 ? 1 : T < ACENDE ? lerp(1, 0.35, ease((T - 27.7) / 0.6)) : lerp(0.35, 1.0, ease((T - ACENDE) / 0.6));
+    const f = flick(t, 11);
+    lightAll(sc, { L1: { p: V3(mx - 1.2 + 0.6 * k, my + 0.25, 0.32), c: C(1.0, 0.58, 0.28).multiplyScalar(2.4 * f * lampOn), r: 1.6 },
+      L2: { p: V3(mx + 0.05, my, 0.12), c: C(1.0, 0.55, 0.18).multiplyScalar(1.6 * g), r: 0.35 },
+      D: { d: V3(0.3, 0.5, 1), c: C(0.04, 0.05, 0.1).multiplyScalar(lampOn) }, ambTop: C(0.008, 0.01, 0.02), ambBot: C(0.005, 0.004, 0.003), fog: { c: C(0.03, 0.04, 0.08), n: 3, f: 9 } });
+    pó.userData.update(t);
+  } };
+}
+
+// ---------- S6 · O CARIMBO DO TÍTULO ----------
+const IMPACTO = 31.95;
+function S6() {
+  const sc = new THREE.Scene(); sc.background = new THREE.Color(0x0b1124);
+  const ppu = PPU(330); const L0 = placaTitulo(ppu, 6, 2.6, 'O CASO DAVI', false); const L1 = placaTitulo(ppu, 6, 2.6, 'O CASO DAVI', true);
+  const t0 = heightTexture(L0, { noiseAmp: 0.04, seed: 3, alphaFromH: 0.05 }), t1 = heightTexture(L1, { noiseAmp: 0.04, seed: 3, alphaFromH: 0.05 });
+  const p = plate(L0, t0, { tex2: t1, hScale: 0.12, shadowLen: 0.8, detAmp: 0.003 }); place(p, -3, -1.3, 0); sc.add(p);
+  const mesa = new Layer(14, 8, PPU(60)); mesa.raise(c => c.fillRect(0, 0, 14, 8), 0.1, 0); mesa.incise(c => { const r = rng(4); for (let i = 0; i < 300; i++) { c.lineWidth = 0.01 + r() * 0.02; const y = r() * 8; line(c, [0, y], [14, y + (r() - 0.5) * 0.2]); } }, 0.15, 2);
+  const mp = plate(mesa, heightTexture(mesa, { noiseAmp: 0.05 }), { hScale: 0.1, colLow: 0x161c30, colHigh: 0x3a4466 }); place(mp, -7, -4, -0.4); sc.add(mp);
+  const bloco = new THREE.Mesh(new THREE.BoxGeometry(6.3, 2.9, 0.9), new THREE.MeshStandardMaterial({ color: 0x5a3a24, roughness: 0.85 })); sc.add(bloco);
+  const pl = new THREE.PointLight(0xffa860, 30, 0, 2); sc.add(pl); sc.add(new THREE.AmbientLight(0x223355, 0.6));
+  const NB = 220, bpos = new Float32Array(NB * 3), bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.BufferAttribute(bpos, 3));
+  const bur = new THREE.Points(bg, new THREE.PointsMaterial({ color: 0xffd0a0, size: 0.03, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending, depthWrite: false })); sc.add(bur);
+  const r = rng(5); const bd = []; for (let i = 0; i < NB; i++) { const a = r() * Math.PI * 2; bd.push([Math.cos(a), Math.sin(a) * 0.5, r()]); }
+  return { sc, update(t, u) {
+    const T = 31.4 + t; const d = T - IMPACTO;
+    const shake = d > 0 && d < 0.5 ? (1 - d / 0.5) * 0.035 : 0;
+    cam(V3(0.0, -0.15, 7.4), V3(0.0, -0.05, 6.7), V3(0, 0, 0), V3(0, 0.02, 0), easeInOut(u), 34);
+    camera.position.x += Math.sin(T * 80) * shake; camera.position.y += Math.cos(T * 67) * shake;
+    // bloco: desce (z 4 → 0.6), bate, sobe para fora do quadro
+    let z, y; if (d < 0) { const a = clamp((d + 0.55) / 0.55, 0, 1); z = lerp(4.2, 0.58, a * a); y = lerp(1.6, 0, a); } else { const a = clamp((d - 0.12) / 0.6, 0, 1); z = lerp(0.58, 6.5, ease(a)); y = lerp(0, 2.2, ease(a)); }
+    bloco.position.set(0, y, z); bloco.visible = z < 6.2;
+    p.material.uniforms.press.value = d < 0 ? 0 : clamp(d / 0.06, 0, 1);
+    for (let i = 0; i < NB; i++) { const v = bd[i], ok = d > 0 && d < 1.2; const s = d * (1.2 + v[2] * 1.5);
+      bpos[i * 3] = ok ? v[0] * (3.1 + s) : 0; bpos[i * 3 + 1] = ok ? v[1] * (1.4 + s) - 0.2 * d * d : -99; bpos[i * 3 + 2] = ok ? 0.15 + v[2] * 0.4 : 0; }
+    bg.attributes.position.needsUpdate = true; bur.material.opacity = d > 0 ? clamp(1 - d / 1.2, 0, 1) * 0.8 : 0;
+    const f = flick(t, 13);
+    pl.position.set(-2.5, 2.5, 3.0); pl.intensity = 25 * f;
+    lightAll(sc, { L1: { p: V3(-3.4, 1.6, 1.1), c: C(1.0, 0.6, 0.3).multiplyScalar(3.0 * f), r: 4.5 },
+      L2: { p: V3(4.0, -1.0, 1.5), c: C(0.25, 0.33, 0.7).multiplyScalar(1.2), r: 6 },
+      D: { d: V3(0.0, 0.4, 1), c: C(0.05, 0.06, 0.12) }, ambTop: C(0.03, 0.035, 0.07), ambBot: C(0.02, 0.014, 0.01), fog: { c: C(0.05, 0.07, 0.14), n: 20, f: 40 } });
+  } };
+}
+
+// ---------------- controle ----------------
+let atual = null, atualId = null;
+function dispose(sc) { sc.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) { for (const k in o.material.uniforms || {}) { const v = o.material.uniforms[k].value; if (v && v.isTexture && !v.userData.keep) v.dispose(); } o.material.dispose(); } }); }
+window.renderAt = (T) => {
+  const s = SHOTS.find(s => T >= s.ini && T < s.fim) || SHOTS[SHOTS.length - 1];
+  if (atualId !== s.id) { if (atual) dispose(atual.sc); atual = s.build(); atualId = s.id; }
+  const t = T - s.ini, u = clamp(t / (s.fim - s.ini), 0, 1);
+  atual.update(t, u); renderer.render(atual.sc, camera); return s.id;
+};
+window.frame = () => canvas.toDataURL('image/png');
+await document.fonts.load('900 64px "Fraunces"'); await document.fonts.load('700 64px "Fraunces"'); await document.fonts.load('400 italic 64px "Fraunces"');
+await document.fonts.load('600 32px "IBM Plex Mono"'); await document.fonts.load('64px "Noto Sans Phoenician"', '\u{10901}');
+window.ready = true;
+</script></body></html>

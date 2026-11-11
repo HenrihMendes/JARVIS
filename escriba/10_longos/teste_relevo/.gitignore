@@ -1,0 +1,11 @@
+node_modules/
+frames/
+out/
+prev/
+prevfull/
+logs/
+overlay/
+overlay.ffconcat
+*.wav
+*.mp3
+*.mp4
