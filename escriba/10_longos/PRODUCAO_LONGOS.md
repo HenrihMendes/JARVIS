@@ -40,7 +40,7 @@
 - **Fotos:** `L01_o-caso-davi/assets/fotos/` (`baixar.sh`, `CREDITOS.md`). O Wikimedia limita os pedidos (429), então baixar devagar.
   - Faltam a estela de Tel Dan, o portal de Karnak e Qeiyafa.
   - No lugar delas foram usados o portão de Tel Dan, a lista de Sisaque e a fortaleza em 3D.
-- **Mídias** (quadros, mp3, mp4) **não vão para o Git**. A narração do cap. 0 está em `L01_o-caso-davi/producao/cap0_voz.mp3`, só nesta máquina.
+- **Mídias** (quadros, mp3, mp4) **não vão para o Git**. A narração do cap. 0 também está guardada no ElevenLabs: flow `2MGWDdGu9YZZ9ik6RWt1`, sessão `wlCJqQfzONo1sPllfEi0`. Para baixar de novo **sem gastar créditos**, use `creative_get_flow_run_status`, que devolve a URL do áudio.
 
 ## 4. Estado do L01 "O caso Davi"
 - ✅ **Cap. 0 (abertura, 57 s)** pronto no estilo antigo (argila lisa). A refazer em low poly e mais lento, sem gerar a narração de novo.
