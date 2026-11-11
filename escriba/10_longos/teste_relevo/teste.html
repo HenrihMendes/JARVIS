@@ -169,7 +169,7 @@ function S5a() {
     const k = easeInOut(u);
     cam(V3(1.45, 0.7, 7.4), V3(1.6, 2.55, 4.9), V3(1.5, 1.9, 0), V3(1.6, 2.75, 0), k, 34);
     const f = flick(t, 9);
-    lightAll(sc, { L1: { p: V3(lerp(-1.0, -0.4, k), lerp(2.0, 3.4, k), 0.8), c: C(1.0, 0.58, 0.28).multiplyScalar(3.6 * f), r: 3.2 },
+    lightAll(sc, { L1: { p: V3(lerp(-0.8, -0.3, k), lerp(2.0, 3.4, k), 0.85), c: C(1.0, 0.58, 0.28).multiplyScalar(4.8 * f), r: 3.4 },
       L2: { p: V3(4.8, 5.5, 1.5), c: C(0.25, 0.34, 0.72).multiplyScalar(0.7), r: 7 },
       D: { d: V3(0.3, 0.5, 1), c: C(0.05, 0.065, 0.13) }, ambTop: C(0.03, 0.035, 0.075), ambBot: C(0.015, 0.012, 0.01), fog: { c: C(0.04, 0.055, 0.11), n: 7, f: 18 } });
     pó.userData.update(t);
@@ -190,7 +190,7 @@ function S5b() {
     cam(V3(mx + 0.55, my - 0.12, 2.3), V3(mx + 0.12, my - 0.04, 1.35), V3(mx + 0.35, my, 0), V3(mx + 0.02, my + 0.01, 0), k, 32);
     const g = T < ACENDE ? 0 : clamp((T - ACENDE) / 0.45, 0, 1); const pulse = g * (1.7 + 0.15 * Math.sin((T - ACENDE) * 5));
     p.material.uniforms.emisA.value = pulse * (T < ACENDE + 0.2 ? (0.6 + 0.4 * Math.sin((T - ACENDE) * 60)) : 1);
-    const lampOn = T < 27.7 ? 1 : T < ACENDE ? lerp(1, 0.35, ease((T - 27.7) / 0.6)) : lerp(0.35, 1.0, ease((T - ACENDE) / 0.6));
+    const lampOn = T < 27.7 ? 1 : T < ACENDE ? lerp(1, 0.62, ease((T - 27.7) / 0.6)) : lerp(0.62, 1.0, ease((T - ACENDE) / 0.6));
     const f = flick(t, 11);
     lightAll(sc, { L1: { p: V3(mx - 1.2 + 0.6 * k, my + 0.25, 0.32), c: C(1.0, 0.58, 0.28).multiplyScalar(2.4 * f * lampOn), r: 1.6 },
       L2: { p: V3(mx + 0.05, my, 0.12), c: C(1.0, 0.55, 0.18).multiplyScalar(1.6 * g), r: 0.35 },
@@ -219,8 +219,9 @@ function S6() {
     cam(V3(0.0, -0.15, 7.4), V3(0.0, -0.05, 6.7), V3(0, 0, 0), V3(0, 0.02, 0), easeInOut(u), 34);
     camera.position.x += Math.sin(T * 80) * shake; camera.position.y += Math.cos(T * 67) * shake;
     // bloco: desce (z 4 → 0.6), bate, sobe para fora do quadro
-    let z, y; if (d < 0) { const a = clamp((d + 0.55) / 0.55, 0, 1); z = lerp(4.2, 0.58, a * a); y = lerp(1.6, 0, a); } else { const a = clamp((d - 0.12) / 0.6, 0, 1); z = lerp(0.58, 6.5, ease(a)); y = lerp(0, 2.2, ease(a)); }
-    bloco.position.set(0, y, z); bloco.visible = z < 6.2;
+    // o bloco desce de cima e sai por cima (nunca passa na frente da câmera)
+    let z, y; if (d < 0) { const a = clamp((d + 0.55) / 0.55, 0, 1); z = lerp(1.6, 0.58, a * a); y = lerp(4.8, 0, a * a); } else { const a = clamp((d - 0.12) / 0.5, 0, 1); z = lerp(0.58, 1.6, ease(a)); y = lerp(0, 5.2, ease(a)); }
+    bloco.position.set(0, y, z); bloco.visible = y < 5.0;
     p.material.uniforms.press.value = d < 0 ? 0 : clamp(d / 0.06, 0, 1);
     for (let i = 0; i < NB; i++) { const v = bd[i], ok = d > 0 && d < 1.2; const s = d * (1.2 + v[2] * 1.5);
       bpos[i * 3] = ok ? v[0] * (3.1 + s) : 0; bpos[i * 3 + 1] = ok ? v[1] * (1.4 + s) - 0.2 * d * d : -99; bpos[i * 3 + 2] = ok ? 0.15 + v[2] * 0.4 : 0; }
