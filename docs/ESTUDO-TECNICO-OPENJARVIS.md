@@ -41,7 +41,7 @@
 
 > **Decisão tomada (11/11/2026):** o OpenJarvis **será a base**, com as condições da seção 14. A arquitetura da seção 8 será ajustada quando chegarem os dados do notebook.
 
-**6. A maior incógnita é o seu notebook.** Não consigo enxergá-lo deste ambiente (estou num container na nuvem). Sem saber GPU e RAM, não dá para prometer IA local boa. A seção 7 traz comandos **somente leitura** para você rodar. O resultado decide se o "cérebro" pode ser 100% local ou se precisa de um plano híbrido.
+**6. Seu notebook é o ponto fraco.** Lenovo IdeaPad Slim 3 com i5-13420H, **8 GB de RAM** e **sem placa de vídeo dedicada**. Dá para voz local e um "cérebro" pequeno (modelo de 2B), mas não para a inteligência das demonstrações. Detalhes e caminhos de melhoria na seção 7.1.
 
 **7. Custo:** dá para ter **R$ 0/mês** com tudo local, aceitando um assistente mais lento e menos inteligente que os de demonstração. Um plano híbrido sensato (local por padrão, nuvem só quando você autorizar) fica em **poucos dólares por mês** (seção 10).
 
@@ -267,11 +267,58 @@ Centenas de commits por mês. Se você construir em cima e personalizar, cada at
 
 ## 7. Seu notebook: diagnóstico e o que ele aguenta
 
-### 7.1 Por que eu não sei ainda
+### 7.1 Diagnóstico do seu notebook (dados de 11/11/2026)
 
-Esta sessão roda num container na nuvem, sem acesso ao seu computador. Também não há pasta do seu PC compartilhada via Remote Control. **Não vou chutar.**
+| Item | Seu notebook | O que significa |
+|---|---|---|
+| Modelo | Lenovo IdeaPad Slim 3 15IRH10 | — |
+| Processador | Intel Core i5-13420H: 8 núcleos (4 de desempenho + 4 de eficiência), 12 threads, até 4,6 GHz | Bom para notebook. É ele que vai rodar a IA. |
+| RAM | 8 GB DDR5-4800 (7,67 GB utilizáveis) | **O gargalo principal.** Pela ficha da Lenovo, esses 8 GB são soldados na placa e existe **um slot livre** (a confirmar no seu aparelho). Com um módulo só, a memória roda em **canal único**, com metade da velocidade de leitura possível. A IA local depende muito dessa velocidade. |
+| Placa de vídeo | Intel UHD Graphics, integrada (48 EUs; os "128 MB" são só a reserva de vídeo) | **Não ajuda na IA.** O Ollama ignora GPUs integradas por padrão, e nessa classe a CPU tende a ser mais rápida. |
+| NPU | Não tem (a 13ª geração da Intel não tem) | — |
+| Disco | 477 GB, com 252 GB livres | **Sobra espaço.** Precisamos de cerca de 30 GB. |
+| Sistema | Windows 11, 64 bits, x64 | Compatível com tudo do plano |
 
-### 7.2 Comandos de diagnóstico (somente leitura)
+**Veredito: é o perfil A da tabela 7.3, o mais fraco.**
+
+**Orçamento de memória com 8 GB** (estimativas, a medir na Etapa 0):
+
+| Peça | Memória |
+|---|---|
+| Windows 11 e programas em segundo plano | 3–4 GB |
+| Modelo de 2B quantizado, contexto de 4k | ~2 GB |
+| Whisper `base` ou `small` (int8) | 0,3–1 GB |
+| Voz Piper | 0,1–0,2 GB |
+| OpenJarvis (Python) e interface | 0,5–1 GB |
+| **Total** | **6–8 GB: no limite.** Com o navegador aberto, o Windows passa a usar o disco como memória e tudo fica lento. |
+
+**O que roda bem hoje:**
+- ouvir a palavra "Jarvis" (openWakeWord), transcrever (Whisper `base`/`small`) e falar (Piper);
+- conversa simples e resumos curtos com um modelo de 2B (`qwen3.5:2b`);
+- briefing de "bom dia" **pré-calculado** antes de você acordar. Processar um prompt longo (e-mails, notícias, agenda) na CPU pode levar dezenas de segundos; feito com antecedência, isso não importa;
+- comandos frequentes ("abra o Spotify", "que horas são", "crie um lembrete") reconhecidos **por regra**, sem depender da IA. É rápido, confiável e não erra de ferramenta.
+
+**O que não roda bem hoje:**
+- modelos de 4B ou maiores junto com voz e interface: a memória estoura;
+- a voz Kokoro, padrão do OpenJarvis: puxa PyTorch e transformers (`uv.lock`), pesado demais para 8 GB. Por isso a voz será **Piper**;
+- o `gemma4:e2b` padrão do Ollama (download de 7,2 GB), recomendado em alguns guias para "8 GB": não cabe;
+- tarefas com várias etapas e ferramentas: um modelo de 2B erra muito;
+- o contexto padrão do OpenJarvis (16 mil tokens): precisa cair para 4–8 mil.
+
+### 7.1.1 Caminhos para melhorar
+
+| Opção | Custo | O que você ganha |
+|---|---|---|
+| **A.** Ficar com 8 GB, tudo local | R$ 0 | Assistente básico: voz, comandos por regra, conversa simples, briefing pré-calculado |
+| **B.** 8 GB + nuvem opcional (pergunta pendente da seção 14) | Poucos dólares por mês, só quando usar | Inteligência de verdade em pesquisa e tarefas complexas. O texto desses pedidos sai do PC. |
+| **C.** Adicionar um módulo de 16 GB DDR5 SO-DIMM (total de 24 GB, o máximo testado pela Lenovo, em canal duplo) | Cerca de R$ 1.400 a R$ 2.650 em anúncios recentes. Memória está cara; confira antes de comprar. | Modelo de 4B com folga; 9B possível, mas lento; geração de texto até cerca de 2× mais rápida pelo canal duplo (estimativa) |
+| **D.** C + B | Soma dos dois | O melhor possível neste notebook. Continua sem GPU, então nunca vai ser rápido como nos vídeos. |
+
+**Recomendação:** não compre memória agora. Construa A + B, com a porta da nuvem pronta e **desligada**, e meça tudo na Etapa 0. Se a lentidão ou a burrice do modelo local incomodarem, o upgrade de RAM é a melhor compra possível para este notebook, mas só depois de medir.
+
+**Para confirmar o slot livre (só leitura):** Gerenciador de Tarefas → Desempenho → Memória → "Slots usados". Se aparecer **1 de 2**, há um slot livre.
+
+### 7.2 Comandos de diagnóstico (somente leitura, opcionais agora)
 
 Abra o **PowerShell** (não precisa ser administrador) e cole o bloco abaixo. Ele **só lê** informações e não instala, altera ou envia nada. Depois cole o resultado aqui.
 
@@ -436,7 +483,56 @@ JARVIS/
 └── scripts/                               ← diagnóstico (só leitura) e instalação
 ```
 
-O repositório **Sexta-Feira** atual é um site imobiliário (Astro) sem relação com este projeto. Sugiro não misturar. Se quiser o nome "Sexta-Feira" para o assistente, decidimos isso antes de criar pastas.
+O repositório **Sexta-Feira** atual é um site imobiliário (Astro) sem relação com este projeto e fica fora dele (decisão de 11/11/2026).
+
+### 8.6 Ajuste: OpenJarvis como base (decisão de 11/11/2026)
+
+As seções 8.1 a 8.5 continuam valendo como princípios e fluxo. A diferença é **quem faz cada parte**:
+
+```
+┌──────────── NOSSA CAMADA (repositório JARVIS) ────────────┐   ┌──── OPENJARVIS (versão travada, sem modificar) ────┐
+│ Ouvidos: openWakeWord ("Jarvis"), Silero VAD, Whisper      │   │ Cérebro: classe pública `Jarvis` (sdk.py) → Ollama │
+│ Boca: Piper, frase a frase                                 │   │ Memória: fatos do usuário + documentos (SQLite)    │
+│ Comandos por regra (abrir app, hora, lembrete, bom dia)    │──►│ Conectores: Google Agenda, Gmail, RSS              │
+│ Motor de permissões + ferramentas Windows                  │   │ Briefing: agente morning_digest + agendador        │
+│ Interface (React + Three.js) via WebSocket                 │   │ MCP e skills (novas ferramentas)                   │
+│ Clima (Open-Meteo), roteador local/nuvem (nuvem desligada) │   │ Motores de nuvem (só se a nuvem for ligada)        │
+└────────────────────────────────────────────────────────────┘   └────────────────────────────────────────────────────┘
+```
+
+**Como os dois se conectam:**
+
+- **Um único processo Python.** Nossa camada importa o OpenJarvis como biblioteca e usa só a classe pública `Jarvis`. Nada de módulos internos com `_` no nome, como faz o exemplo da seção 2. Com 8 GB de RAM, um processo a menos faz diferença. Se a integração ficar instável, a alternativa é falar com o `jarvis serve` por HTTP.
+- **Versão travada no `pyproject.toml`**, apontando para um commit específico do GitHub. Nenhuma cópia do código do OpenJarvis dentro do nosso repositório.
+- **Extras mínimos.** Sem `voice` (Kokoro/PyTorch), sem `desktop`, sem `mining`. A lista final sai da Etapa 0.
+
+**Como cada pedido é tratado:**
+
+1. **Comando conhecido** ("abra o Spotify", "que horas são", "bom dia, Jarvis") → reconhecido por regra → motor de permissões → executa. Sem IA, rápido e previsível.
+2. **Conversa** → `Jarvis.ask_stream()` → Piper fala frase a frase. É o caminho rápido, mas sem ferramentas e sem histórico (limitação do SDK, seção 14.1). O histórico curto da conversa será montado pela nossa camada.
+3. **Pedido que precisa de ferramenta** → `Jarvis.ask()` com um agente que só enxerga **as nossas** ferramentas seguras. É mais lento, porque espera a resposta inteira.
+4. **Pedido complexo com a nuvem ligada** → mesmo caminho, com um motor de nuvem, dentro do teto de gasto.
+
+**Estrutura de pastas ajustada:**
+
+```
+JARVIS/
+├── docs/                 estudo, arquitetura, decisões
+├── core/                 nossa camada (Python 3.12, uv)
+│   ├── pyproject.toml    depende do OpenJarvis travado num commit
+│   └── src/jarvis/
+│       ├── app.py        FastAPI + WebSocket para a interface
+│       ├── estado.py     máquina de estados (os 7 estados da interface)
+│       ├── audio/        ativacao.py · vad.py · stt.py · tts_piper.py · reproducao.py
+│       ├── comandos/     intencoes.py (comandos por regra)
+│       ├── cerebro/      ponte_openjarvis.py · roteador.py (local x nuvem)
+│       ├── ferramentas/  permissoes.py · apps_windows.py · arquivos.py · lembretes.py
+│       ├── clima/        open_meteo.py
+│       └── seguranca/    cofre.py · auditoria.py · conteudo_nao_confiavel.py
+├── ui/                   Vite + React + TypeScript + Three.js
+├── config/               jarvis.example.toml · permissoes.example.toml · openjarvis.example.toml
+└── modelos/              (fora do git) palavra "Jarvis", voz Piper
+```
 
 ---
 
@@ -448,12 +544,12 @@ O repositório **Sexta-Feira** atual é um site imobiliário (Astro) sem relaç�
 | Gerenciador | **uv** | Rápido, cria ambiente isolado, não suja o Python do sistema | pip + venv | MIT/Apache |
 | Servidor local | **FastAPI + WebSocket** | Padrão comprovado (o exemplo do guia e o OpenJarvis usam) | — | MIT |
 | Motor de IA local | **Ollama** | Instalador Windows, suporte a NVIDIA, AMD e (desde a 0.30, segundo terceiros) Vulkan; expõe API compatível com OpenAI | LM Studio, llama.cpp server | MIT |
-| Modelo local | **Qwen 3.5 (4B/9B)** ou **Gemma 4 (E2B/E4B)**: decidir por teste em pt-BR | Ambos com bom multilinguismo; escolha por medição, não por fama | — | verificar a licença de cada um na Etapa 0 |
+| Modelo local | **`qwen3.5:2b`** no notebook atual (8 GB). `qwen3.5:4b` ou `gemma4:e4b` só com mais RAM. Decidir por teste em pt-BR. | É o que cabe junto com voz e interface; escolha por medição, não por fama | — | verificar a licença de cada um na Etapa 0 |
 | Fala → texto | **faster-whisper** (`small` ou `medium`, int8, `language="pt"`) | Melhor custo-benefício local em português; já testado no Windows pelo OpenJarvis | whisper.cpp | MIT |
 | Fim da fala (VAD) | **Silero VAD** | Neural, leve, muito melhor que limiar de volume | WebRTC VAD | MIT |
 | Palavra de ativação | **openWakeWord** com modelo treinado para "Jarvis" | Local, grátis, roda em CPU. O **Porcupine** (Picovoice) **encerrou o plano gratuito em 30/06/2026**, segundo relatos de usuários; o plano pago "Foundation" custa ~US$ 6 mil/ano, segundo terceiros. | Whisper contínuo (como no exemplo analisado): gasta CPU e transcreve tudo que você fala | código Apache 2.0; verificar a licença dos modelos pré-treinados |
 | Palmas | Detector de "ataque" sonoro + verificação com **YAMNet** (classe "Clapping") só nos candidatos | Corta os falsos positivos do limiar simples sem gastar CPU o tempo todo | Só limiar (como no exemplo analisado) | Apache 2.0 |
-| Texto → fala | **Kokoro** (`pf_dora`/`pm_alex`) **vs. Piper** (`pt_BR-faber`, `jeff`): teste de audição na Etapa 0 | Os dois rodam em CPU; nenhum soa humano em pt-BR. Qwen3-TTS (clonagem de voz, pt-BR) é promissor, mas prefere GPU. | ElevenLabs (pago, muito mais natural) | Kokoro Apache 2.0; Piper: verificar (o repositório mudou de mantenedor) |
+| Texto → fala | **Piper** (`pt_BR-faber`, `jeff`) no notebook atual. Kokoro (`pf_dora`) só com mais RAM, porque no OpenJarvis ele puxa PyTorch e transformers. Teste de audição na Etapa 0. | Os dois rodam em CPU; nenhum soa humano em pt-BR. O OpenJarvis não suporta Piper, então a voz fica na nossa camada. Qwen3-TTS (clonagem de voz, pt-BR) é promissor, mas prefere GPU. | ElevenLabs (pago, muito mais natural) | Kokoro Apache 2.0; Piper: verificar (o repositório mudou de mantenedor) |
 | Memória | **SQLite** (FTS5 + `sqlite-vec`) | Um arquivo, zero servidor, persistente, fácil de fazer backup e de apagar | LanceDB | domínio público / MIT |
 | Embeddings | modelo multilíngue via Ollama (ex.: `bge-m3`) | Busca semântica em português | — | verificar |
 | Ferramentas externas | **MCP** (Model Context Protocol) | Padrão aberto; dá para plugar servidores prontos sem reescrever | Plugins próprios | — |
@@ -532,12 +628,12 @@ Cada etapa termina com algo **funcionando e testável**, e só passamos para a p
 
 | # | Etapa | Entrega | Critério de pronto | Esforço |
 |---|---|---|---|---|
-| **0** | **Diagnóstico e prova de viabilidade** | Você roda o diagnóstico (seção 7.2). Com sua aprovação: instalar **só o Ollama** e testar 2–3 modelos com um roteiro fixo de 10 perguntas em pt-BR (conversa, resumo de e-mail, escolha de ferramenta em JSON). Testar Whisper `small` e `medium` com 10 frases gravadas por você. Teste de audição Kokoro vs. Piper. | Planilha com tokens/s, uso de RAM, acertos e latência. **Decisão:** 100% local ou híbrido; qual modelo; qual voz. | P |
+| **0** | **Prova de viabilidade no seu notebook** | Hardware já conhecido (seção 7.1). Com sua aprovação: instalar o Ollama e o OpenJarvis (versão travada, telemetria desligada, extras mínimos). Testar `qwen3.5:2b` e `qwen3.5:4b` com um roteiro fixo de 10 perguntas em pt-BR (conversa, resumo de e-mail, escolha de ferramenta em JSON), medindo velocidade, RAM e uso do disco como memória. Testar Whisper `base` e `small` com 10 frases gravadas por você. Teste de audição Piper vs. Kokoro. Confirmar se `jarvis serve` e o SDK funcionam no Windows. | Planilha com tokens/s, uso de RAM, acertos e latência. **Decisões:** modelo, voz, nuvem opcional, upgrade de RAM. | P |
 | **1** | **Núcleo de voz (aperte para falar)** | Atalho → ouvir → transcrever → modelo local em streaming → falar frase a frase. Interface mínima no navegador. | Conversa de 5 turnos em pt-BR, com histórico, sem travar. Latência medida e registrada. | M |
 | **2** | **Ativação** | Palavra "Jarvis" (openWakeWord treinado) + palmas com verificação (opcional) + atalho de reserva. Encerramento por frase ("obrigado, Jarvis") ou silêncio. | Menos de 1 falso acionamento por hora com TV ou música ligada; mais de 90% de acerto quando você chama. | M |
 | **3** | **Interface J.A.R.V.I.S. v1** | Esfera animada (Three.js), ondas reagindo ao microfone e à voz, os 7 estados visuais, painel de conversa, modo de baixo consumo. | Os 7 estados aparecem corretos ao vivo; uso de GPU em repouso medido e aceitável. | G |
 | **4** | **Memória** | Histórico da conversa + fatos que **você aprova** ("lembre que...") + tela "o que você sabe sobre mim", com editar e apagar. | Ele lembra uma preferência depois de reiniciar; "esqueça isso" apaga de verdade. | M |
-| **5** | **Ferramentas seguras no Windows** | Motor de permissões (níveis de risco, lista de apps e pastas permitidas, confirmação, log de auditoria). Abrir apps da lista, buscar arquivos, lembretes com notificação do Windows. | Nenhuma ação de escrita sem confirmação; ação fora da lista é recusada; teste de "e-mail malicioso" não dispara nada. | G |
+| **5** | **Ferramentas seguras no Windows** | Motor de permissões (níveis de risco, lista de apps e pastas permitidas, confirmação, log de auditoria). Comandos frequentes reconhecidos por regra, sem IA. Abrir apps da lista, buscar arquivos, lembretes com notificação do Windows. | Nenhuma ação de escrita sem confirmação; ação fora da lista é recusada; teste de "e-mail malicioso" não dispara nada. | G |
 | **6** | **Integrações** | Clima (Open-Meteo), notícias (RSS que você escolher), Google Agenda e Gmail **somente leitura**, busca web. Tokens no cofre do Windows. | Cada integração funciona sozinha e falha de forma graciosa (sem internet, token expirado). | M |
 | **7** | **Briefing "Bom dia, Jarvis"** | Coleta agendada às 6h30, redação em pt-BR, cartões visuais (clima, agenda, e-mails prioritários, notícias, pendências) e narração. | "Bom dia, Jarvis" começa a responder em segundos, porque já está pronto. Nada inventado: todo item com origem. | M |
 | **8** | **Análise de arquivos** | Indexar pastas que você escolher (PDF, DOCX, TXT); perguntas com citação do arquivo e trecho. | Respostas com fonte; pasta fora da lista não é lida. | M |
@@ -585,8 +681,10 @@ Você pediu um parceiro crítico, então aqui vai sem rodeio:
 
 ### 14.2 Pendentes
 
-1. **Hardware:** resultado do diagnóstico da seção 7.2.
-2. **Nuvem:** pode existir um modo híbrido **opcional, desligado por padrão** e com teto de gasto? Ou o projeto é **estritamente** local?
+1. **Nuvem:** pode existir um modo híbrido **opcional, desligado por padrão** e com teto de gasto? Ou o projeto é **estritamente** local? Com 8 GB de RAM e sem GPU, a recomendação de deixar essa porta pronta ficou mais forte (seção 7.1.1).
+2. **Upgrade de RAM:** recomendação é **não comprar agora** e decidir depois das medições da Etapa 0.
+3. **Slot livre:** confirmar no Gerenciador de Tarefas (seção 7.1.1).
+4. **Aprovação do plano** (seção 12) para começar a Etapa 0. Nada será instalado antes disso.
 
 ---
 
@@ -618,3 +716,6 @@ Você pediu um parceiro crítico, então aqui vai sem rodeio:
 - Token OAuth do Google com expiração em 7 dias: https://www.unipile.com/google-oauth-refresh-token/ · https://groups.google.com/g/adwords-api/c/vdrb2QMWXHQ
 - Gemini API, uso de dados no plano grátis: https://ai.google.dev/gemini-api/terms · https://ai.google.dev/gemini-api/docs/logs-policy
 - Preços da Claude API: documentação oficial da Anthropic (tabela de modelos, 11/2026)
+- Seu notebook, memória e expansão: https://psref.lenovo.com/Product/IdeaPad/IdeaPad_Slim_3_15IRH10 · https://www.kingston.com/en/memory/search/model/110300/lenovo-ideapad-slim-3-15irh10 · https://www.mrmemory.co.uk/memory-ram-upgrades/lenovo/ideapad/slim-3-15irh10
+- Processador i5-13420H: https://www.intel.com/content/www/us/en/products/sku/232173.html · https://techpowerup.com/cpu-specs/core-i5-13420h.c3058
+- Preços de memória DDR5 SO-DIMM 16 GB no Brasil (anúncios sem data confiável): https://www.buscape.com.br/busca/16gb+ddr5-5600+sodimm · https://lista.mercadolivre.com.br/memoria-ram-notebook-ddr5-16gb-5600 · https://www.pichau.com.br/memoria-para-notebook-corsair-sodimm-ddr5-16gb-1x16gb-ddr5-5600mhz-c48-cmsx16gx5m1a5600c48
