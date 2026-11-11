@@ -255,6 +255,23 @@ function shotFotosMesa(arqs) { return async () => {
     meta() { camera.updateMatrixWorld(); return { focos: centros.map(c => { const v = c.clone().project(camera); return [(v.x + 1) / 2, (1 - v.y) / 2]; }) }; } };
 }; }
 
+// L01 cap. 1: Samuel diante dos 7 filhos de Jessé (relevo; Samuel espelhado, à direita; o lugar vazio do caçula à esquerda)
+async function shotFila() {
+  const sc = new THREE.Scene(); sc.background = new THREE.Color(0x0a0f20);
+  const Lw = paredeOficina(PPU(90), 17, 9, 5); const wall = plate(Lw, heightTexture(Lw, { noiseAmp: 0.04 }), { hScale: 0.22, colLow: 0x161c30, colHigh: 0x3a4466, shadowLen: 2 }); place(wall, -2.5, -1.6, -1.8); sc.add(wall);
+  const ppu = PPU(200); const M = new Layer(13, 6.8, ppu); M.raise(c => c.fillRect(0, 0, 13, 0.5), 0.3, 3);
+  const espelha = (L) => { const c = document.createElement('canvas'); c.width = L.c.width; c.height = L.c.height; const x = c.getContext('2d'); x.scale(-1, 1); x.drawImage(L.c, -c.width, 0); return { c, h: L.h }; };
+  for (let i = 0; i < 7; i++) M.stamp(figura(ppu, { s: 1.85 + ((i * 37) % 5) * 0.08, seed: 80 + i, passo: 0.25 }), 1.9 + i * 1.12, 0.45);
+  M.stamp(espelha(figura(ppu, { s: 2.25, roupa: 'longa', barba: 'longa', cabeca: 'gorro', seed: 90 })), 10.3, 0.45);
+  const mid = plate(M, heightTexture(M, { noiseAmp: 0.02, alphaFromH: 0.04 }), { hScale: 0.2, shadowLen: 1.4 }); place(mid, -0.5, -0.9, 0); sc.add(mid);
+  const pó = particles({ n: 400, box: [13, 6, 3], center: [6, 2.4, 1.2], color: 0xffd0a0, size: 0.02, opacity: 0.4, seed: 53 }); sc.add(pó);
+  return { sc, dof: false, update(t, u) {
+    cam(V3(6.0, 2.3, 13.6), V3(6.0, 2.3, 13.6), V3(6.0, 2.3, 0), V3(6.0, 2.3, 0), 0, 32); const f = flick(t, 6);
+    lightAll(sc, { L1: { p: V3(11.5, 4.2, 1.6), c: C(1.0, 0.58, 0.26).multiplyScalar(3.4 * f), r: 7 }, L2: { p: V3(1, 5, 1.6), c: C(0.25, 0.33, 0.68).multiplyScalar(1.4), r: 8 }, D: { d: V3(-0.2, 0.4, 1), c: C(0.05, 0.06, 0.12) }, ambTop: C(0.03, 0.035, 0.075), ambBot: C(0.02, 0.014, 0.01), fog: { c: C(0.05, 0.065, 0.13), n: 10, f: 30 } });
+    pó.userData.update(t);
+  } };
+}
+
 // ======================= RELEVO =======================
 async function shotJerusalem() {
   const sc = new THREE.Scene(); sc.background = new THREE.Color(0x0a1022);
@@ -348,9 +365,10 @@ window.renderAt = async (T) => {
 };
 // v2 (diretor.js): qualquer plano, em qualquer instante, fora da linha do tempo antiga
 const CATALOGO = Object.fromEntries(SHOTS.map(s => [s.id, s.build]));
-Object.assign(CATALOGO, { C06t: shotMesa('tres'), C13e: shotMesa('tabEncara'), C09f: shotFotosMesa(['estela_tel_dan.jpg', 'estela_mesa_louvre.jpg', 'lista_sisaque.jpg']) });
+Object.assign(CATALOGO, { FILA: shotFila, C06t: shotMesa('tres'), C13e: shotMesa('tabEncara'), C09f: shotFotosMesa(['estela_tel_dan.jpg', 'estela_mesa_louvre.jpg', 'lista_sisaque.jpg']) });
 window.renderShot = async (id, t, u) => {
-  if (atualId !== id) { if (atual && atual.sc !== undefined) dispose(atual.sc); atual = await CATALOGO[id](); atualId = id; }
+  if (atualId !== id) { if (atual && atual.sc !== undefined) dispose(atual.sc);
+    const b = CATALOGO[id] || (id.startsWith('foto:') ? shotFoto(id.slice(5), { rot: id.length % 2 ? 0.012 : -0.012, cam: [0, 0, 1.9, 0, 0, 1.9] }) : null); atual = await b(); atualId = id; }
   atual.update(t, u); if (atual.dof) { rp.scene = atual.sc; bokeh.scene = atual.sc; composer.render(); } else renderer.render(atual.sc, camera);
   return atual.meta ? atual.meta() : null;
 };

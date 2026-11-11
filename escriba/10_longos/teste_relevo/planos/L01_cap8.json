@@ -1,0 +1,152 @@
+{
+ "titulo": "L01 · cap. 8",
+ "pagina": "cap0.html",
+ "qs": "lp=1",
+ "saida": "out_v2/cap8",
+ "dur": 62.8,
+ "planos": [
+  {
+   "id": "C8P01",
+   "ini": 0.0,
+   "fim": 5.585,
+   "tipo": "quadro",
+   "cena": "foto:vale_de_ela.jpg",
+   "luz": "lamparina",
+   "cam": [
+    {
+     "t": 0,
+     "z": 1.0,
+     "x": 0.5,
+     "y": 0.5
+    },
+    {
+     "t": 5.58,
+     "z": 1.1,
+     "x": 0.5,
+     "y": 0.5
+    }
+   ]
+  },
+  {
+   "id": "C8P02",
+   "ini": 5.585,
+   "fim": 10.87,
+   "tipo": "quadro",
+   "cena": "FILA",
+   "luz": "lamparina",
+   "cam": [
+    {
+     "t": 0,
+     "z": 1.8,
+     "x": 0.14,
+     "y": 0.55
+    },
+    {
+     "t": 5.29,
+     "z": 1.95,
+     "x": 0.12,
+     "y": 0.55
+    }
+   ]
+  },
+  {
+   "id": "C8P03",
+   "ini": 10.87,
+   "fim": 21.81,
+   "tipo": "quadro",
+   "cena": "foto:estela_tel_dan.jpg",
+   "luz": "lamparina",
+   "cam": [
+    {
+     "t": 0,
+     "z": 1.0,
+     "x": 0.5,
+     "y": 0.5
+    },
+    {
+     "t": 10.94,
+     "z": 1.1,
+     "x": 0.5,
+     "y": 0.5
+    }
+   ]
+  },
+  {
+   "id": "C8P04",
+   "ini": 21.81,
+   "fim": 35.36,
+   "tipo": "quadro",
+   "cena": "C09f",
+   "luz": "lamparina",
+   "escala": 3,
+   "cam": [
+    {
+     "t": 0,
+     "z": 1.12,
+     "x": 0.5,
+     "y": 0.5
+    },
+    {
+     "t": 13.55,
+     "z": 1.0,
+     "x": 0.5,
+     "y": 0.5
+    }
+   ]
+  },
+  {
+   "id": "C8P05",
+   "ini": 35.36,
+   "fim": 38.8,
+   "tipo": "quadro",
+   "cena": "C14",
+   "luz": "lamparina",
+   "u": 0.5,
+   "cam": [
+    {
+     "t": 0,
+     "z": 1.0,
+     "x": 0.5,
+     "y": 0.5
+    },
+    {
+     "t": 3.44,
+     "z": 1.1,
+     "x": 0.5,
+     "y": 0.5
+    }
+   ]
+  },
+  {
+   "id": "C8P90",
+   "ini": 38.8,
+   "fim": 42.8,
+   "tipo": "reusa",
+   "clipe": "out_v2/cap0/clipes/P11.mp4",
+   "t0": 0
+  },
+  {
+   "id": "C8P91",
+   "ini": 42.8,
+   "fim": 62.8,
+   "tipo": "quadro",
+   "cena": "C04",
+   "u": 0.0,
+   "luz": "lamparina",
+   "cam": [
+    {
+     "t": 0,
+     "z": 1.12,
+     "x": 0.5,
+     "y": 0.5
+    },
+    {
+     "t": 20.0,
+     "z": 1.0,
+     "x": 0.5,
+     "y": 0.5
+    }
+   ]
+  }
+ ]
+}

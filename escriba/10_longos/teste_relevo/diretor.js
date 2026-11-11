@@ -18,18 +18,18 @@ const P = ROT.planos;
 P.forEach((p, i) => { p.dur = +(p.fim - p.ini).toFixed(3); p.head = p.entrada?.tipo === 'funde' ? p.entrada.dur / 2 : 0; const nx = P[i + 1]; p.tail = nx?.entrada?.tipo === 'funde' ? nx.entrada.dur / 2 : 0; p.n = Math.round((p.dur + p.head + p.tail) * FPS); });
 
 let browser = null; const paginas = {};
-async function pagina(escala) {
-  if (paginas[escala]) return paginas[escala];
+async function pagina(escala, pag = ROT.pagina, qs = ROT.qs) {
+  const chave = pag + '|' + escala; if (paginas[chave]) return paginas[chave];
   browser = browser || await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--allow-file-access-from-files', '--ignore-gpu-blocklist'] });
   const pg = await browser.newPage({ viewport: { width: W, height: H } });
   pg.on('pageerror', e => console.log('[pageerror]', e.message)); pg.on('console', m => { if (m.type() === 'error') console.log('[page]', m.text().slice(0, 300)); });
-  await pg.goto('file://' + path.resolve(__dirname, ROT.pagina) + '?s=' + escala + (ROT.qs ? '&' + ROT.qs : '')); await pg.waitForFunction('window.ready === true', null, { timeout: 180000 });
-  return (paginas[escala] = pg);
+  await pg.goto('file://' + path.resolve(__dirname, pag) + '?s=' + escala + (qs ? '&' + qs : '')); await pg.waitForFunction('window.ready === true', null, { timeout: 180000 });
+  return (paginas[chave] = pg);
 }
 const salva = async (pg, fp, fmt) => { const d = await pg.evaluate(f => window.frame(f), fmt); fs.writeFileSync(fp, Buffer.from(d.split(',')[1], 'base64')); };
 
 async function anim(p, clip) {
-  const pg = await pagina(1); const dir = path.join(OUT, 'tmp', p.id); fs.mkdirSync(dir, { recursive: true }); const ini = Date.now();
+  const pg = await pagina(1, p.pagina, p.qs); const dir = path.join(OUT, 'tmp', p.id); fs.mkdirSync(dir, { recursive: true }); const ini = Date.now();
   const [u0, u1] = p.u_faixa || [0, 1];
   for (let f = 0; f < p.n; f++) {
     const fp = path.join(dir, `f${String(f).padStart(5, '0')}.jpg`); if (fs.existsSync(fp)) continue;
@@ -40,10 +40,13 @@ async function anim(p, clip) {
   fs.rmSync(dir, { recursive: true, force: true }); return (Date.now() - ini) / 1000;
 }
 
+// reaproveita um clipe já pronto (ex.: o gancho do cap. 0); congela o último quadro se faltar tempo
+function reusa(p, clip) { ff(['-ss', p.t0 || 0, '-i', path.resolve(__dirname, p.clipe), '-vf', `tpad=stop_mode=clone:stop_duration=${p.n / FPS},fps=${FPS},format=yuv420p`, '-frames:v', p.n, '-c:v', 'libx264', '-crf', 12, '-preset', 'fast', clip]); return 0; }
+
 async function quadro(p) {
   const fp = path.join(OUT, 'quadros', p.id + '.png'), fm = path.join(OUT, 'quadros', p.id + '.json');
   if (!fs.existsSync(fp) || (REFAZ && REFAZ.includes(p.id))) {
-    const pg = await pagina(p.escala || 2); const meta = await pg.evaluate(([c, t, u]) => window.renderShot(c, t, u), [p.cena, p.t ?? 0, p.u ?? 0.5]);
+    const pg = await pagina(p.escala || 2, p.pagina, p.qs); const meta = await pg.evaluate(([c, t, u]) => window.renderShot(c, t, u), [p.cena, p.t ?? 0, p.u ?? 0.5]);
     await salva(pg, fp, 'png'); fs.writeFileSync(fm, JSON.stringify(meta || {}));
   }
   return { fp, meta: JSON.parse(fs.readFileSync(fm, 'utf8')) };
@@ -78,7 +81,8 @@ async function clipeQuadro(p, clip) {
     const clip = path.join(OUT, 'clipes', p.id + '.mp4'); if (REFAZ && !REFAZ.includes(p.id) && fs.existsSync(clip)) continue;
     if (!REFAZ && !SO_QUADROS && fs.existsSync(clip)) continue;
     if (SO_QUADROS && p.tipo !== 'quadro') continue;
-    let s; try { s = p.tipo === 'anim' ? await anim(p, clip) : await clipeQuadro(p, clip); } catch (e) { const m = `${p.id} FALHOU: ${String(e.message || e).split('\n')[0]}`; console.log(m); log.push(m); continue; }
+    p.cena = p.cena || p.tipo;
+    let s; try { s = p.tipo === 'anim' ? await anim(p, clip) : p.tipo === 'reusa' ? reusa(p, clip) : await clipeQuadro(p, clip); } catch (e) { const m = `${p.id} FALHOU: ${String(e.message || e).split('\n')[0]}`; console.log(m); log.push(m); continue; }
     const msg = `${p.id} ${p.tipo.padEnd(6)} ${p.cena.padEnd(5)} ${p.dur.toFixed(1).padStart(4)} s → ${s.toFixed(0)} s de render`; console.log(msg); log.push(msg);
   }
   if (browser) await browser.close(); if (SO_QUADROS) return;

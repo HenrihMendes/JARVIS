@@ -1,0 +1,324 @@
+{
+ "titulo": "L01 · cap. 3",
+ "pagina": "cap0.html",
+ "qs": "lp=1",
+ "saida": "out_v2/cap3",
+ "dur": 108.0,
+ "planos": [
+  {
+   "id": "C3P01",
+   "ini": 0.0,
+   "fim": 12.55,
+   "tipo": "quadro",
+   "cena": "S1",
+   "luz": "lamparina",
+   "u": 0.3,
+   "cam": [
+    {
+     "t": 0,
+     "z": 1.15,
+     "x": 0.45,
+     "y": 0.5
+    },
+    {
+     "t": 12.55,
+     "z": 1.15,
+     "x": 0.55,
+     "y": 0.5
+    }
+   ],
+   "pagina": "teste.html"
+  },
+  {
+   "id": "C3P02",
+   "ini": 12.55,
+   "fim": 18.35,
+   "tipo": "quadro",
+   "cena": "S1",
+   "luz": "lamparina",
+   "u": 0.85,
+   "cam": [
+    {
+     "t": 0,
+     "z": 1.15,
+     "x": 0.55,
+     "y": 0.5
+    },
+    {
+     "t": 5.8,
+     "z": 1.15,
+     "x": 0.45,
+     "y": 0.5
+    }
+   ],
+   "pagina": "teste.html"
+  },
+  {
+   "id": "C3P03",
+   "ini": 18.35,
+   "fim": 30.84,
+   "tipo": "quadro",
+   "cena": "C03",
+   "luz": "lamparina",
+   "u": 0.6,
+   "cam": [
+    {
+     "t": 0,
+     "z": 1.15,
+     "x": 0.5,
+     "y": 0.44
+    },
+    {
+     "t": 12.49,
+     "z": 1.15,
+     "x": 0.5,
+     "y": 0.56
+    }
+   ]
+  },
+  {
+   "id": "C3P04",
+   "ini": 30.84,
+   "fim": 32.3,
+   "tipo": "quadro",
+   "cena": "C14",
+   "luz": "lamparina",
+   "u": 0.8,
+   "cam": [
+    {
+     "t": 0,
+     "z": 1.0,
+     "x": 0.5,
+     "y": 0.5
+    },
+    {
+     "t": 1.46,
+     "z": 1.1,
+     "x": 0.5,
+     "y": 0.5
+    }
+   ]
+  },
+  {
+   "id": "C3P05",
+   "ini": 32.3,
+   "fim": 44.44,
+   "tipo": "quadro",
+   "cena": "foto:tel_dan_portao.jpg",
+   "luz": "lamparina",
+   "cam": [
+    {
+     "t": 0,
+     "z": 1.15,
+     "x": 0.45,
+     "y": 0.5
+    },
+    {
+     "t": 12.14,
+     "z": 1.15,
+     "x": 0.55,
+     "y": 0.5
+    }
+   ]
+  },
+  {
+   "id": "C3P06",
+   "ini": 44.44,
+   "fim": 52.747,
+   "tipo": "quadro",
+   "cena": "foto:estela_tel_dan.jpg",
+   "luz": "lamparina",
+   "cam": [
+    {
+     "t": 0,
+     "z": 1.0,
+     "x": 0.5,
+     "y": 0.5
+    },
+    {
+     "t": 8.31,
+     "z": 1.3,
+     "x": 0.5,
+     "y": 0.48
+    }
+   ]
+  },
+  {
+   "id": "C3P07",
+   "ini": 52.747,
+   "fim": 57.505,
+   "tipo": "anim",
+   "cena": "S4",
+   "pagina": "teste.html"
+  },
+  {
+   "id": "C3P08",
+   "ini": 57.505,
+   "fim": 59.884,
+   "tipo": "quadro",
+   "cena": "S2",
+   "luz": "lamparina",
+   "u": 0.5,
+   "cam": [
+    {
+     "t": 0,
+     "z": 1.0,
+     "x": 0.5,
+     "y": 0.5
+    },
+    {
+     "t": 2.38,
+     "z": 1.1,
+     "x": 0.5,
+     "y": 0.5
+    }
+   ],
+   "pagina": "teste.html"
+  },
+  {
+   "id": "C3P09",
+   "ini": 59.884,
+   "fim": 64.05,
+   "tipo": "anim",
+   "cena": "S5b",
+   "t0": -1.773,
+   "pagina": "teste.html"
+  },
+  {
+   "id": "C3P10",
+   "ini": 64.05,
+   "fim": 72.77,
+   "tipo": "quadro",
+   "cena": "foto:obelisco_negro.jpg",
+   "luz": "lamparina",
+   "cam": [
+    {
+     "t": 0,
+     "z": 1.15,
+     "x": 0.5,
+     "y": 0.44
+    },
+    {
+     "t": 8.72,
+     "z": 1.15,
+     "x": 0.5,
+     "y": 0.56
+    }
+   ]
+  },
+  {
+   "id": "C3P11",
+   "ini": 72.77,
+   "fim": 79.2,
+   "tipo": "quadro",
+   "cena": "C05",
+   "luz": "lamparina",
+   "t": 5.0,
+   "cam": [
+    {
+     "t": 0,
+     "z": 1.15,
+     "x": 0.45,
+     "y": 0.5
+    },
+    {
+     "t": 6.43,
+     "z": 1.15,
+     "x": 0.55,
+     "y": 0.5
+    }
+   ]
+  },
+  {
+   "id": "C3P12",
+   "ini": 79.2,
+   "fim": 85.605,
+   "tipo": "quadro",
+   "cena": "C14",
+   "luz": "lamparina",
+   "u": 0.4,
+   "cam": [
+    {
+     "t": 0,
+     "z": 1.0,
+     "x": 0.5,
+     "y": 0.5
+    },
+    {
+     "t": 6.41,
+     "z": 1.1,
+     "x": 0.5,
+     "y": 0.5
+    }
+   ]
+  },
+  {
+   "id": "C3P13",
+   "ini": 85.605,
+   "fim": 92.01,
+   "tipo": "quadro",
+   "cena": "foto:estela_tel_dan.jpg",
+   "luz": "lamparina",
+   "cam": [
+    {
+     "t": 0,
+     "z": 1.12,
+     "x": 0.5,
+     "y": 0.5
+    },
+    {
+     "t": 6.41,
+     "z": 1.0,
+     "x": 0.5,
+     "y": 0.5
+    }
+   ]
+  },
+  {
+   "id": "C3P14",
+   "ini": 92.01,
+   "fim": 98.13,
+   "tipo": "quadro",
+   "cena": "S5a",
+   "luz": "lamparina",
+   "u": 0.7,
+   "cam": [
+    {
+     "t": 0,
+     "z": 1.0,
+     "x": 0.5,
+     "y": 0.5
+    },
+    {
+     "t": 6.12,
+     "z": 1.1,
+     "x": 0.5,
+     "y": 0.5
+    }
+   ],
+   "pagina": "teste.html"
+  },
+  {
+   "id": "C3P15",
+   "ini": 98.13,
+   "fim": 108.0,
+   "tipo": "quadro",
+   "cena": "foto:estela_mesa_louvre.jpg",
+   "luz": "lamparina",
+   "cam": [
+    {
+     "t": 0,
+     "z": 1.0,
+     "x": 0.5,
+     "y": 0.5
+    },
+    {
+     "t": 9.87,
+     "z": 1.1,
+     "x": 0.5,
+     "y": 0.5
+    }
+   ]
+  }
+ ]
+}

@@ -230,8 +230,27 @@ function S6() {
   } };
 }
 
+// ---------- L01 cap. 4 · A PEDRA NO FOGO (1869): basalto de topo arredondado, sem letras legíveis (não inventamos texto) ----------
+function SFogo() {
+  const sc = new THREE.Scene(); sc.background = new THREE.Color(0x05060c);
+  const ceuP = ceu({ w: 40, h: 16, horY: 0.3, glowAmt: 0.6, hor: 0x3a1a10, mid: 0x120c18, top: 0x04050c }); ceuP.position.set(1.5, 3, -6); sc.add(ceuP);
+  const L = new Layer(3.0, 4.6, PPU(300)); L.raise(c => smooth(c, [[0.1, 0], [2.9, 0], [2.95, 3.4], [2.6, 4.3], [1.5, 4.6], [0.4, 4.3], [0.05, 3.4]]), 0.6, 10);
+  L.incise(c => { const r = rng(9); for (let i = 0; i < 34; i++) { c.lineWidth = 0.012; const y = 0.5 + i * 0.105; line(c, [0.35 + r() * 0.1, y], [2.65 - r() * 0.1, y + (r() - 0.5) * 0.02]); } }, 0.08, 1);
+  const p = plate(L, heightTexture(L, { noiseAmp: 0.05, noiseScale: 5, alphaFromH: 0.05 }), { hScale: 0.12, shadowLen: 0.6, ...BASALTO, detAmp: 0.004 }); place(p, 0, 0, 0); sc.add(p);
+  const fogos = []; for (let i = 0; i < 7; i++) { const f = flame({ w: 0.5 + (i % 3) * 0.15, h: 1.1 + (i % 2) * 0.5, seed: 30 + i }); f.position.set(-0.2 + i * 0.57, 0.35, 0.5 + (i % 2) * 0.25); sc.add(f); fogos.push(f); }
+  const brasa = particles({ n: 600, box: [4, 4, 1.5], center: [1.5, 2.0, 0.8], color: 0xff8a3a, size: 0.03, opacity: 0.85, seed: 31, rise: 0.6, drift: 0.15 }); sc.add(brasa);
+  return { sc, update(t, u) { const k = easeInOut(u);
+    cam(V3(1.5, 1.6, 8.2), V3(1.5, 2.0, 6.6), V3(1.5, 2.0, 0), V3(1.5, 2.3, 0), k, 34); const f = flick(t, 17);
+    lightAll(sc, { L1: { p: V3(1.5, 0.4, 1.4), c: C(1.0, 0.45, 0.15).multiplyScalar(6.0 * f), r: 4.5 }, L2: { p: V3(-3, 5, 2), c: C(0.25, 0.3, 0.6).multiplyScalar(0.5), r: 7 },
+      D: { d: V3(0, 0.3, 1), c: C(0.04, 0.03, 0.05) }, ambTop: C(0.02, 0.02, 0.04), ambBot: C(0.05, 0.02, 0.01), fog: { c: C(0.06, 0.03, 0.03), n: 8, f: 20 } });
+    fogos.forEach(fl => { fl.lookAt(camera.position); fl.userData.update(t); }); brasa.userData.update(t); ceuP.userData.update(t);
+  } };
+}
+
 // ---------------- controle ----------------
 let atual = null, atualId = null;
+const CATALOGO = Object.assign(Object.fromEntries(SHOTS.map(s => [s.id, s.build])), { SFogo });
+window.renderShot = async (id, t, u) => { if (atualId !== id) { if (atual) dispose(atual.sc); atual = await CATALOGO[id](); atualId = id; } atual.update(t, u); renderer.render(atual.sc, camera); return atual.meta ? atual.meta() : null; };
 function dispose(sc) { sc.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) { for (const k in o.material.uniforms || {}) { const v = o.material.uniforms[k].value; if (v && v.isTexture && !v.userData.keep) v.dispose(); } o.material.dispose(); } }); }
 window.renderAt = (T) => {
   const s = SHOTS.find(s => T >= s.ini && T < s.fim) || SHOTS[SHOTS.length - 1];
@@ -239,7 +258,7 @@ window.renderAt = (T) => {
   const t = T - s.ini, u = clamp(t / (s.fim - s.ini), 0, 1);
   atual.update(t, u); renderer.render(atual.sc, camera); return s.id;
 };
-window.frame = () => canvas.toDataURL('image/png');
+window.frame = (fmt) => fmt === 'jpg' ? canvas.toDataURL('image/jpeg', 0.95) : canvas.toDataURL('image/png');
 await document.fonts.load('900 64px "Fraunces"'); await document.fonts.load('700 64px "Fraunces"'); await document.fonts.load('400 italic 64px "Fraunces"');
 await document.fonts.load('600 32px "IBM Plex Mono"'); await document.fonts.load('64px "Noto Sans Phoenician"', '\u{10901}');
 window.ready = true;
