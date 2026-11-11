@@ -168,8 +168,23 @@ function luzesMesa(m, t) { const f = flick(t, 2); m.luz.intensity = 3.2 * f; m.f
   lightAll(m.sc, { L1: { p: m.luz.position, c: C(1.0, 0.62, 0.32).multiplyScalar(2.2 * f), r: 3 }, L2: { p: V3(-2.2, 2.2, 1.2), c: C(0.25, 0.32, 0.65).multiplyScalar(1.2), r: 6 }, D: { d: V3(0.3, 0.5, 1), c: C(0.03, 0.04, 0.08) }, ambTop: C(0.03, 0.035, 0.07), ambBot: C(0.02, 0.014, 0.01), fog: { c: C(0.04, 0.05, 0.1), n: 20, f: 40 } }); }
 function shotMesa(tipo) { return async () => { const m = setMesa(); return { sc: m.sc, dof: true, update(t, u) {
   const k = easeInOut(u), T = twos(t); m.q.forEach(qq => qq.visible = false); m.solidos.forEach(s => s.visible = false); m.tab.visible = true; m.nuvem.material.opacity = 0;
+  m.q.forEach((qq, i) => { qq.position.x = 0; m.solidos[i].position.x = 0; });
   m.selos.forEach((s, i) => { s.position.set(-0.225 + i * 0.15, 0.04, 0.03); s.rotation.set(0, 0, 0); });
-  if (tipo === 'olhar') { // ergue os olhos para a câmera
+  if (tipo === 'tres') { // v2: moeda, coluna e tabuinha lado a lado, desfazendo no ritmo da fala (18,55 · 19,75 · 20,95)
+    m.tab.visible = false; const xs = [-0.24, 0, 0.24], t0s = [0.35, 1.55, 2.75]; let ativo = -1;
+    for (let i = 0; i < 3; i++) { const tq = t - t0s[i]; m.q[i].position.x = xs[i]; m.solidos[i].position.x = xs[i]; m.solidos[i].visible = tq < 0; m.q[i].visible = tq >= 0; if (tq >= 0) { m.q[i].userData.quebra(tq, 0.0); ativo = i; } }
+    if (ativo >= 0) { const tq = t - t0s[ativo]; m.nuvem.material.opacity = clamp(0.9 - tq * 0.5, 0, 0.9); m.nuvem.position.set(xs[ativo], tq * 0.15, 0); }
+    m.esc.pose({ cabX: 0.35, olhar: [0, -0.7], palpebra: 0.6, E: { x: -1.05, z: 0.15, cot: -0.75 }, D: { x: -1.0, z: 0.15, cot: -0.8 } });
+    cam(V3(0.32, 1.1, 1.3), V3(0.1, 1.02, 1.12), V3(-0.04, 0.9, 0.42), V3(0.06, 0.9, 0.42), k, 30); bokeh.uniforms.focus.value = lerp(0.98, 0.75, k); bokeh.uniforms.aperture.value = 0.008;
+  } else if (tipo === 'tabEncara') { // v2: um selo sai da Tabuleta; depois o Escriba ergue a cabeça e encara ("você decide", 50,6)
+    const s = m.selos[2]; const a = smooth01((t - 1.6) / 0.8); s.position.set(-0.225 + 2 * 0.15 + a * 0.5, 0.04 - a * 0.025, 0.03 + a * 0.12); s.rotation.y = a * 0.8;
+    const b = smooth01((t - 3.3) / 1.1), kt = easeInOut(clamp(t / 3.8, 0, 1)), ke = easeInOut(clamp((t - 3.3) / 3.1, 0, 1));
+    m.esc.pose({ cabX: lerp(0.38, 0.0, b), olhar: [0, lerp(-0.7, 0.05, b)], palpebra: lerp(0.6, 0.4, b), sobrancelha: lerp(0, 0.12, b), E: { x: -1.05, z: 0.15, cot: -0.75 }, D: { x: -1.0, z: 0.15, cot: -0.8 }, inclina: lerp(0, 0.08, b) });
+    const pA = V3(0.45, 1.5, 0.95).lerp(V3(0.32, 1.32, 0.78), kt), lA = V3(0.02, 0.84, 0.16).lerp(V3(0.05, 0.84, 0.18), kt);
+    const pB = V3(0.18, 1.24, 0.95).lerp(V3(0.1, 1.22, 0.66), ke), lB = V3(0, 1.18, -0.66);
+    camera.position.lerpVectors(pA, pB, b); camera.lookAt(lA.lerp(lB, b)); camera.fov = lerp(32, 28, b); camera.updateProjectionMatrix();
+    bokeh.uniforms.focus.value = lerp(lerp(1.15, 0.98, kt), lerp(1.65, 1.35, ke), b); bokeh.uniforms.aperture.value = lerp(0.009, 0.007, b);
+  } else if (tipo === 'olhar') { // ergue os olhos para a câmera
     const a = smooth01((t - 0.15) / 0.7);
     m.esc.pose({ cabX: lerp(0.35, 0.02, a), olhar: [0, lerp(-0.7, 0.05, a)], palpebra: lerp(0.62, 0.42, a), sobrancelha: lerp(0, -0.35, a), E: { x: -1.05, z: 0.15, cot: -0.75, dedos: 0.4 }, D: { x: -1.0, z: 0.15, cot: -0.8, dedos: 0.5 }, inclina: 0.06 });
     cam(V3(0.32, 1.3, 1.25), V3(0.24, 1.27, 1.0), V3(0, 1.17, -0.66), V3(0, 1.17, -0.66), k, 30); bokeh.uniforms.focus.value = 1.85; bokeh.uniforms.aperture.value = 0.006;
@@ -220,6 +235,24 @@ function shotFoto(arq, mov) { return async () => {
     const [x0, y0, z0, x1, y1, z1] = mov.cam; cam(V3(x0, y0, z0), V3(x1, y1, z1), V3(x0 * 0.9, y0 * 0.9, 0), V3(x1 * 0.9, y1 * 0.9, 0), k, 32);
     luz.intensity = 22 * flick(t, 4); bokeh.uniforms.focus.value = camera.position.z; bokeh.uniforms.aperture.value = 0.0025; pó.userData.update(t);
   } };
+}; }
+
+// v2: as três provas lado a lado na mesa (quadro único; o diretor percorre uma por uma com a câmera do ffmpeg)
+function shotFotosMesa(arqs) { return async () => {
+  const sc = new THREE.Scene(); sc.background = new THREE.Color(0x07090f); const texs = await Promise.all(arqs.map(a => loadTex(FOTOS + a)));
+  const mesa = new THREE.Mesh(new THREE.PlaneGeometry(16, 9), clay(0x3a2618, { bump: 1.4 })); mesa.receiveShadow = true; sc.add(mesa);
+  const hh = 1.0, gap = 0.3, rots = [-0.03, 0.02, -0.015, 0.025], dy = [0.04, -0.05, 0.02, -0.03]; const ws = texs.map(t => hh * t.image.width / t.image.height);
+  const total = ws.reduce((a, b) => a + b, 0) + gap * (texs.length - 1); let x = -total / 2; const centros = [];
+  texs.forEach((tex, i) => { const ww = ws[i];
+    const borda = new THREE.Mesh(new THREE.PlaneGeometry(ww + 0.08, hh + 0.08), clay(0xe6dac2, { bump: 0.3 })); borda.position.z = 0.004; borda.castShadow = true; borda.receiveShadow = true;
+    const foto = new THREE.Mesh(new THREE.PlaneGeometry(ww, hh), new THREE.MeshStandardMaterial({ map: tex, roughness: 0.55 })); foto.position.z = 0.008; foto.receiveShadow = true;
+    const g = new THREE.Group(); g.add(borda, foto); g.position.set(x + ww / 2, dy[i], 0.01); g.rotation.z = rots[i]; sc.add(g); centros.push(V3(x + ww / 2, dy[i], 0.01)); x += ww + gap; });
+  const luz = new THREE.SpotLight(0xffe0bc, 36, 14, 0.9, 0.7, 1.3); luz.position.set(-1.8, 1.4, 4.2); luz.target.position.set(0, 0, 0); luz.castShadow = true; sc.add(luz, luz.target);
+  sc.add(new THREE.AmbientLight(0x4a5070, 0.5));
+  const pó = particles({ n: 700, box: [total + 1, 2.2, 1.5], center: [0, 0, 0.8], color: 0xffe0b8, size: 0.006, opacity: 0.6, seed: 41 }); sc.add(pó);
+  const dist = (total / 2 + 0.3) / (Math.tan(THREE.MathUtils.degToRad(16)) * 16 / 9);
+  return { sc, dof: false, update(t, u) { cam(V3(0, -0.04, dist), V3(0, -0.04, dist), V3(0, 0, 0), V3(0, 0, 0), 0, 32); pó.userData.update(t); },
+    meta() { camera.updateMatrixWorld(); return { focos: centros.map(c => { const v = c.clone().project(camera); return [(v.x + 1) / 2, (1 - v.y) / 2]; }) }; } };
 }; }
 
 // ======================= RELEVO =======================
@@ -313,7 +346,15 @@ window.renderAt = async (T) => {
   if (atual.dof) { rp.scene = atual.sc; bokeh.scene = atual.sc; composer.render(); } else renderer.render(atual.sc, camera);
   return s.id;
 };
-window.frame = () => canvas.toDataURL('image/png');
+// v2 (diretor.js): qualquer plano, em qualquer instante, fora da linha do tempo antiga
+const CATALOGO = Object.fromEntries(SHOTS.map(s => [s.id, s.build]));
+Object.assign(CATALOGO, { C06t: shotMesa('tres'), C13e: shotMesa('tabEncara'), C09f: shotFotosMesa(['tel_dan_portao.jpg', 'estela_mesa_louvre.jpg', 'lista_sisaque.jpg']) });
+window.renderShot = async (id, t, u) => {
+  if (atualId !== id) { if (atual && atual.sc !== undefined) dispose(atual.sc); atual = await CATALOGO[id](); atualId = id; }
+  atual.update(t, u); if (atual.dof) { rp.scene = atual.sc; bokeh.scene = atual.sc; composer.render(); } else renderer.render(atual.sc, camera);
+  return atual.meta ? atual.meta() : null;
+};
+window.frame = (fmt) => fmt === 'jpg' ? canvas.toDataURL('image/jpeg', 0.95) : canvas.toDataURL('image/png');
 await document.fonts.load('900 64px "Fraunces"'); await document.fonts.load('700 64px "Fraunces"'); await document.fonts.load('400 italic 64px "Fraunces"');
 await document.fonts.load('600 32px "IBM Plex Mono"'); await document.fonts.load('64px "Noto Sans Phoenician"', '\u{10901}');
 window.ready = true;

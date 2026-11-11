@@ -1,0 +1,26 @@
+{
+  "titulo": "L01 · cap. 0 · abertura (v2: pipeline de quadro-chave, low poly, mesma narração)",
+  "pagina": "cap0.html",
+  "qs": "lp=1",
+  "saida": "out_v2/cap0",
+  "dur": 57.2,
+  "planos": [
+    { "id": "P01", "ini": 0.0,  "fim": 5.0,  "tipo": "anim",   "cena": "C01",  "nota": "GANCHO. Atrás do pastor, funda girando, gigante do outro lado do riacho" },
+    { "id": "P02", "ini": 5.0,  "fim": 7.6,  "tipo": "quadro", "cena": "C02",  "u": 0.5, "luz": "lamparina",
+      "cam": [{ "t": 0, "z": 1.0, "x": 0.5, "y": 0.5 }, { "t": 3.0, "z": 1.1, "x": 0.5, "y": 0.44 }], "nota": "Jerusalém no morro" },
+    { "id": "P03", "ini": 7.6,  "fim": 11.0, "tipo": "quadro", "cena": "C03",  "u": 0.4, "luz": "lamparina", "entrada": { "tipo": "funde", "dur": 0.8 },
+      "cam": [{ "t": 0, "z": 1.35, "x": 0.63, "y": 0.62 }, { "t": 3.8, "z": 1.55, "x": 0.66, "y": 0.36 }], "nota": "rei com a lira; câmera sobe à coroa" },
+    { "id": "P04", "ini": 11.0, "fim": 18.2, "tipo": "anim",   "cena": "C04",  "nota": "'Só tem um problema': o Escriba ergue os olhos e segura o olhar enquanto a câmera se aproxima" },
+    { "id": "P05", "ini": 18.2, "fim": 23.0, "tipo": "anim",   "cena": "C06t", "nota": "moeda, coluna e tabuinha se desfazem uma por uma, no ritmo da fala" },
+    { "id": "P06", "ini": 23.0, "fim": 29.6, "tipo": "quadro", "cena": "C07",  "t": 6.0, "u": 0.5, "luz": "lamparina",
+      "cam": [{ "t": 0, "z": 1.0, "x": 0.5, "y": 0.5 }, { "t": 6.6, "z": 1.12, "x": 0.52, "y": 0.48 }], "nota": "papiro 'DAVI: LENDA?'" },
+    { "id": "P07", "ini": 29.6, "fim": 32.9, "tipo": "anim",   "cena": "C08",  "nota": "câmera desce pelas camadas de terra" },
+    { "id": "P08", "ini": 32.9, "fim": 42.0, "tipo": "quadro", "cena": "C09f", "escala": 3, "luz": "lamparina", "entrada": { "tipo": "funde", "dur": 0.8 },
+      "cam": [{ "t": 0, "z": 2.0, "foco": 0 }, { "t": 2.0, "z": 2.1, "foco": 0 }, { "t": 2.7, "z": 2.0, "foco": 1 }, { "t": 4.6, "z": 2.1, "foco": 1 }, { "t": 5.3, "z": 2.0, "foco": 2 }, { "t": 9.1, "z": 2.25, "foco": 2 }],
+      "nota": "as 3 provas na mesa; a câmera passa de uma para a outra quando cada uma é citada (testemunhas 1 a 3)" },
+    { "id": "P09", "ini": 42.0, "fim": 46.8, "tipo": "quadro", "cena": "C12b", "u": 0.35,
+      "cam": [{ "t": 0, "z": 1.0, "x": 0.5, "y": 0.5 }, { "t": 4.8, "z": 1.15, "x": 0.5, "y": 0.47 }], "nota": "testemunha 4: a fortaleza no alto do mesmo vale do gancho" },
+    { "id": "P10", "ini": 46.8, "fim": 53.2, "tipo": "anim",   "cena": "C13e", "nota": "um selo sai da Tabuleta; a câmera sobe ao rosto do Escriba: 'você decide'" },
+    { "id": "P11", "ini": 53.2, "fim": 57.2, "tipo": "anim",   "cena": "C15",  "nota": "carimbo 'O CASO DAVI'" }
+  ]
+}
