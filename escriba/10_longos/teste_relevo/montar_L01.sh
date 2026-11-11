@@ -29,5 +29,5 @@ echo "ganho voz ${GV} dB · ganho mix ${GM} dB"
 ffmpeg -y -hide_banner -loglevel error -i out_v2/L01_video.mp4 -f concat -safe 0 -i overlay_L01.ffconcat -i out/L01_mix.wav -filter_complex "
 [0:v]colorbalance=rs=-0.03:gs=-0.01:bs=0.05:rh=0.04:gh=0.01:bh=-0.04,eq=contrast=1.06:saturation=1.06:gamma=1.05,unsharp=5:5:0.35,noise=alls=7:allf=t+u,vignette=angle=PI/5:mode=forward[bg];
 [1:v]fps=24,format=rgba[ov];[bg][ov]overlay=0:0:format=auto:shortest=1,format=yuv420p[v]" \
- -map "[v]" -map 2:a -c:v libx264 -preset slow -crf 18 -profile:v high -pix_fmt yuv420p -c:a aac -b:a 192k -ar 48000 -movflags +faststart -t $DUR out/L01_O_caso_Davi.mp4
+ -map "[v]" -map 2:a -c:v libx264 -preset medium -crf 18 -profile:v high -pix_fmt yuv420p -c:a aac -b:a 192k -ar 48000 -movflags +faststart -t $DUR out/L01_O_caso_Davi.mp4
 ls -la out/L01_O_caso_Davi.mp4

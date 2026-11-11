@@ -108,20 +108,19 @@
    "ini": 30.86,
    "fim": 36.27,
    "tipo": "quadro",
-   "cena": "C05",
+   "cena": "foto:khirbet_qeiyafa.jpg",
    "luz": "lamparina",
-   "t": 5.0,
    "cam": [
     {
      "t": 0,
      "z": 1.15,
-     "x": 0.45,
+     "x": 0.55,
      "y": 0.5
     },
     {
      "t": 5.41,
      "z": 1.15,
-     "x": 0.55,
+     "x": 0.45,
      "y": 0.5
     }
    ]
@@ -180,6 +179,7 @@
    "cena": "C08",
    "luz": "lamparina",
    "u": 0.3,
+   "escala": 1,
    "cam": [
     {
      "t": 0,

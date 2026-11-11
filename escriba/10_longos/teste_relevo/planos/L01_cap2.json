@@ -79,6 +79,7 @@
    "cena": "C08",
    "luz": "lamparina",
    "u": 0.55,
+   "escala": 1,
    "cam": [
     {
      "t": 0,
