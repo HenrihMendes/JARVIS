@@ -19,9 +19,9 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { Layer, plate, heightTexture, colorTexture, lightAll, particles, flame, flick, setRenderer, ease, easeInOut, lerp, clamp, rng, ceu, fbm } from './lib/relevo.js';
 import { figura, paredePalacio, paredeOficina, estela, placaTitulo, faixaRosetas, cidadeMorro, linhaTempo, papiroLenda, estratosRelevo, line, ell, poly, smooth, curve } from './lib/arte.js';
-import { clay, glossy, metal, lumpify, blob, capsula, caixa, cilindro, personagem, lamparina, quebradico, ceuDomo, handTex } from './lib/barro.js';
+import { clay, glossy, metal, lumpify, blob, capsula, caixa, cilindro, personagem, lamparina, quebradico, ceuDomo, handTex, setLowpoly, LOWPOLY } from './lib/barro.js';
 
-const Q = new URLSearchParams(location.search); const SCALE = parseFloat(Q.get('s') || '1');
+const Q = new URLSearchParams(location.search); const SCALE = parseFloat(Q.get('s') || '1'); if (Q.get('lp')) setLowpoly(true);
 const W = Math.round(1920 * SCALE), H = Math.round(1080 * SCALE);
 const canvas = document.getElementById('c');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
@@ -51,17 +51,17 @@ function setVale() {
   sc.fog = new THREE.Fog(0xd29a68, 22, 95);
   const pm = new THREE.PMREMGenerator(renderer); const envSc = new THREE.Scene(); envSc.add(ceuDomo({ top: 0x2a4682, hor: 0xf0a060, sol: 0xffb070, solDir: V3(0.8, 0.2, -0.58), r: 50 })); sc.environment = pm.fromScene(envSc, 0.04).texture; sc.environmentIntensity = 0.35;
   // terreno
-  const g = new THREE.PlaneGeometry(110, 110, 240, 240); g.rotateX(-Math.PI / 2); const p = g.attributes.position; const cols = new Float32Array(p.count * 3); const cA = new THREE.Color(0x8e7a44), cB = new THREE.Color(0x6e6a36), cC = new THREE.Color(0xa88a52), tmp = new THREE.Color();
+  const g = new THREE.PlaneGeometry(110, 110, LOWPOLY ? 90 : 240, LOWPOLY ? 90 : 240); g.rotateX(-Math.PI / 2); const p = g.attributes.position; const cols = new Float32Array(p.count * 3); const cA = new THREE.Color(0x8e7a44), cB = new THREE.Color(0x6e6a36), cC = new THREE.Color(0xa88a52), tmp = new THREE.Color();
   for (let i = 0; i < p.count; i++) { const x = p.getX(i), z = p.getZ(i), y = hVale(x, z); p.setY(i, y); const n = fbm(x * 0.3, z * 0.3, 9, 3); tmp.copy(cA).lerp(cB, n).lerp(cC, clamp(y / 6, 0, 1) * 0.6); cols.set([tmp.r, tmp.g, tmp.b], i * 3); }
   g.setAttribute('color', new THREE.BufferAttribute(cols, 3)); g.computeVertexNormals();
-  const tm = new THREE.MeshPhysicalMaterial({ vertexColors: true, roughness: 0.92, sheen: 0.25, sheenColor: new THREE.Color(0xffd9a0), bumpMap: handTex(), bumpScale: 1.5 }); tm.bumpMap.repeat.set(30, 30);
+  const tm = LOWPOLY ? new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95, flatShading: true }) : new THREE.MeshPhysicalMaterial({ vertexColors: true, roughness: 0.92, sheen: 0.25, sheenColor: new THREE.Color(0xffd9a0), bumpMap: handTex(), bumpScale: 1.5 }); if (tm.bumpMap) tm.bumpMap.repeat.set(30, 30);
   const terr = new THREE.Mesh(g, tm); terr.receiveShadow = true; sc.add(terr);
   // riacho
   const wg = new THREE.PlaneGeometry(110, 1.4, 220, 1); wg.rotateX(-Math.PI / 2); const wp = wg.attributes.position;
   for (let i = 0; i < wp.count; i++) { const x = wp.getX(i), z0 = wp.getZ(i); wp.setZ(i, z0 - 1.4 - Math.sin(x * 0.25) * 0.6); wp.setY(i, hVale(x, -1.4 - Math.sin(x * 0.25) * 0.6) + 0.12); }
   const agua = new THREE.Mesh(wg, new THREE.MeshPhysicalMaterial({ color: 0x5a7a96, roughness: 0.06, clearcoat: 1, metalness: 0.1, envMapIntensity: 1.4 })); sc.add(agua);
   // capim
-  const r = rng(12); const NG = 6500; const cone = new THREE.ConeGeometry(0.018, 0.12, 4); cone.translate(0, 0.06, 0);
+  const r = rng(12); const NG = LOWPOLY ? 0 : 6500; const cone = new THREE.ConeGeometry(0.018, 0.12, 4); cone.translate(0, 0.06, 0);
   const grass = new THREE.InstancedMesh(cone, new THREE.MeshStandardMaterial({ roughness: 0.9 }), NG); const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), sv = new THREE.Vector3(); const gc = [0xa8904e, 0x8a7a44, 0x6e6a36, 0xb89a5a];
   for (let i = 0; i < NG; i++) { let x, z; do { x = (r() - 0.5) * 22; z = 6 - r() * 16; } while (Math.abs(z + 1.4 + Math.sin(x * 0.25) * 0.6) < 0.7 || Math.hypot(x - 0.25, z - 1.0) < 0.7 || Math.hypot(x + 0.5, z + 3.6) < 0.9);
     q.setFromEuler(new THREE.Euler((r() - 0.5) * 0.5, r() * 6, (r() - 0.5) * 0.5)); sv.set(1, 0.6 + r() * 1.2, 1); m4.compose(V3(x, hVale(x, z), z), q, sv); grass.setMatrixAt(i, m4); grass.setColorAt(i, new THREE.Color(gc[(r() * 4) | 0])); }

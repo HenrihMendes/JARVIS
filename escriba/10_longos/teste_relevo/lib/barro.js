@@ -17,9 +17,12 @@ export function handTex() {
 }
 
 const MATS = new Map();
+export let LOWPOLY = false; export function setLowpoly(v) { LOWPOLY = !!v; }
+const SEG = (n, min = 5) => LOWPOLY ? Math.max(min, Math.round(n / 4)) : n;
 // argila fosca com brilho de cetim e marcas de dedo
 export function clay(color, { bump = 0.6, rough = 0.78, sheen = 0.35 } = {}) {
-  const k = `c${color}_${bump}_${rough}`; if (MATS.has(k)) return MATS.get(k);
+  const k = `c${color}_${bump}_${rough}_${LOWPOLY}`; if (MATS.has(k)) return MATS.get(k);
+  if (LOWPOLY) { const m = new THREE.MeshStandardMaterial({ color, roughness: 0.9, metalness: 0, flatShading: true }); MATS.set(k, m); return m; }
   const col = new THREE.Color(color); const sh = col.clone().lerp(new THREE.Color(1, 1, 1), 0.35);
   const m = new THREE.MeshPhysicalMaterial({ color: col, roughness: rough, metalness: 0, sheen, sheenColor: sh, sheenRoughness: 0.6, bumpMap: handTex(), bumpScale: bump });
   MATS.set(k, m); return m;
@@ -29,6 +32,7 @@ export function metal(color, { rough = 0.38 } = {}) { return new THREE.MeshStand
 
 // ---------- deformação "feita à mão": une normais antes de deslocar (evita rachaduras) ----------
 export function lumpify(g, amp = 0.004, freq = 9, seed = 1) {
+  if (LOWPOLY) amp *= 2.2;
   g.deleteAttribute('uv'); const geo = mergeVertices(g, 1e-4); geo.computeVertexNormals();
   const p = geo.attributes.position, n = geo.attributes.normal;
   for (let i = 0; i < p.count; i++) {
@@ -41,10 +45,10 @@ export function lumpify(g, amp = 0.004, freq = 9, seed = 1) {
   geo.setAttribute('uv', new THREE.BufferAttribute(uv, 2)); return geo;
 }
 const M = (geo, mat, cast = true) => { const m = new THREE.Mesh(geo, mat); m.castShadow = cast; m.receiveShadow = true; return m; };
-export const blob = (r, mat, sx = 1, sy = 1, sz = 1, amp = 0.004, seg = 32) => { const g = new THREE.SphereGeometry(r, seg, Math.round(seg * 0.75)); g.scale(sx, sy, sz); return M(lumpify(g, amp * (r / 0.1 > 1 ? r / 0.1 : 1)), mat); };
-export const capsula = (r, len, mat, amp = 0.003) => M(lumpify(new THREE.CapsuleGeometry(r, len, 8, 20), amp), mat);
+export const blob = (r, mat, sx = 1, sy = 1, sz = 1, amp = 0.004, seg = 32) => { seg = SEG(seg, 6); const g = new THREE.SphereGeometry(r, seg, Math.max(4, Math.round(seg * 0.75))); g.scale(sx, sy, sz); return M(lumpify(g, amp * (r / 0.1 > 1 ? r / 0.1 : 1)), mat); };
+export const capsula = (r, len, mat, amp = 0.003) => M(lumpify(new THREE.CapsuleGeometry(r, len, SEG(8, 2), SEG(20, 6)), amp), mat);
 export const caixa = (w, h, d, mat, amp = 0.006, seg = 6) => { const g = new THREE.BoxGeometry(w, h, d, seg, seg, seg); return M(lumpify(g, amp, 6), mat); };
-export const cilindro = (r0, r1, h, mat, amp = 0.004, seg = 32) => M(lumpify(new THREE.CylinderGeometry(r0, r1, h, seg, 6), amp), mat);
+export const cilindro = (r0, r1, h, mat, amp = 0.004, seg = 32) => M(lumpify(new THREE.CylinderGeometry(r0, r1, h, SEG(seg, 6), LOWPOLY ? 1 : 6), amp), mat);
 
 // ---------- túnica em torno, com dobras verticais mais fortes perto da barra ----------
 function tunica(alt, rBarra, mat, seed, curta = false) {
@@ -52,7 +56,7 @@ function tunica(alt, rBarra, mat, seed, curta = false) {
   const perfil = [[rBarra, yb], [rBarra * 0.92, yb + (alt - yb) * 0.25], [rBarra * 0.74, yb + (alt - yb) * 0.55], [rBarra * 0.8, yb + (alt - yb) * 0.78], [rBarra * 0.86, yb + (alt - yb) * 0.9], [rBarra * 0.55, alt * 1.0], [0.02, alt * 1.02]];
   for (let i = 0; i < perfil.length - 1; i++) for (let k = 0; k < 6; k++) { const t = k / 6, a = perfil[i], b = perfil[i + 1]; pts.push(new THREE.Vector2(a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t)); }
   pts.push(new THREE.Vector2(...perfil[perfil.length - 1]));
-  const g = new THREE.LatheGeometry(pts, 64); const p = g.attributes.position; const r = rng(seed); const ph = r() * 6;
+  const g = new THREE.LatheGeometry(LOWPOLY ? pts.filter((_, i) => i % 3 === 0 || i === pts.length - 1) : pts, LOWPOLY ? 12 : 64); const p = g.attributes.position; const r = rng(seed); const ph = r() * 6;
   for (let i = 0; i < p.count; i++) { const x = p.getX(i), y = p.getY(i), z = p.getZ(i); const th = Math.atan2(z, x); const k = Math.pow(Math.min(1, Math.max(0, 1 - (y - yb) / (alt - yb + 1e-6))), 1.6);
     const f = 1 + 0.06 * k * Math.sin(th * 9 + ph + Math.sin(th * 3) * 0.8) + 0.02 * Math.sin(th * 17 + y * 4); p.setX(i, x * f); p.setZ(i, z * f); }
   return M(lumpify(g, 0.003, 7, seed), mat);

@@ -7,7 +7,7 @@ const { chromium } = require('playwright'); const fs = require('fs'); const path
   const b = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--allow-file-access-from-files', '--ignore-gpu-blocklist'] });
   const p = await b.newPage({ viewport: { width: Math.round(1920 * SC), height: Math.round(1080 * SC) } });
   p.on('console', m => { if (m.type() === 'error' || m.type() === 'warning') console.log('[page]', m.text().slice(0, 300)); }); p.on('pageerror', e => console.log('[pageerror]', e.message));
-  await p.goto('file://' + path.resolve(__dirname, process.env.PAGE || 'teste.html') + '?s=' + SC); await p.waitForFunction('window.ready === true', null, { timeout: 120000 });
+  await p.goto('file://' + path.resolve(__dirname, process.env.PAGE || 'teste.html') + '?s=' + SC + (process.env.QS ? '&' + process.env.QS : '')); await p.waitForFunction('window.ready === true', null, { timeout: 120000 });
   const FPS = 24; let tempos = [];
   if (lista) tempos = lista.split(',').map(Number); else { const f0 = Math.round(parseFloat(t0s) * FPS), f1 = Math.round(parseFloat(t1s) * FPS); for (let f = f0; f < f1; f++) tempos.push(f / FPS); }
   const ini = Date.now(); let n = 0;
