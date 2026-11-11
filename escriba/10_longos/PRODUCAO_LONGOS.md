@@ -81,6 +81,22 @@
   - render: `node diretor.js planos/L01_cap0.json` (retomável), ou `node diretor.js planos/L01_cap0.json P08` para um plano só;
   - montagem: `VIDEO=out_v2/cap0/video.mp4 SUF=_v2 ./montar_cap0.sh`.
 
+## 4a. ✅ L01 PRONTO (11/11/2026)
+- **Vídeo:** `teste_relevo/out/L01_O_caso_Davi_upload.mp4` (9:17). Fica fora do Git: para refazer, rodar os passos abaixo.
+- **Descrição, capítulos, comentário fixado e tempos dos anúncios:** `L01_o-caso-davi/descricao_youtube.md`.
+- **Narração:** 9 arquivos em `L01_o-caso-davi/producao/capN_voz.mp3` (no ElevenLabs, flow `2MGWDdGu9YZZ9ik6RWt1`). Caps. 1 a 8: 7.156 créditos.
+- **Como refazer:**
+  1. `python3 tempos.py <caps.json> ../L01_o-caso-davi/producao 1 2 3 4 5 6 7 8 > planos/L01_tempos.json`
+  2. `python3 planos/L01_gerar.py`
+  3. `node diretor.js planos/L01_capN.json` (N = 0 a 8)
+  4. `python3 audio_L01.py`
+  5. camada gráfica: `OVL=overlay_L01.html DUR=557.27 OUT=overlayL01 CONCAT=overlay_L01.ffconcat node overlay.js`
+  6. `./montar_L01.sh`
+- **Lições:**
+  - a cena das camadas de terra (C08) em 4K quebra o WebGL e deixa os planos seguintes pretos: usar `escala: 1`;
+  - conferir sempre uma grade de quadros do vídeo final.
+- **Próximo vídeo:** copiar `planos/L01_gerar.py` como modelo. Só escrever a lista de planos por parágrafo.
+
 ## 4. Estado do L01 "O caso Davi"
 - ✅ **Cap. 0 (abertura, 57 s)** pronto no estilo antigo (argila lisa). A refazer em low poly e mais lento, sem gerar a narração de novo.
 - 🟡 **Caps. 1 a 8:** o **texto v3 está pronto para aprovação** em `L01_o-caso-davi/roteiro_v3_producao.md`. Tem 1.201 palavras, e o vídeo fica em ≈ 9:50 a 10:10.
