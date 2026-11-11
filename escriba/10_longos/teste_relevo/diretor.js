@@ -84,11 +84,11 @@ async function clipeQuadro(p, clip) {
   if (browser) await browser.close(); if (SO_QUADROS) return;
   const faltam = P.filter(p => !fs.existsSync(path.join(OUT, 'clipes', p.id + '.mp4'))).map(p => p.id); if (faltam.length) { console.log('montagem adiada; faltam os clipes', faltam.join(', ')); return; }
   // montagem dos clipes: corte seco (concat) ou fusão (xfade) centrada no corte
-  const ins = P.flatMap(p => ['-i', path.join(OUT, 'clipes', p.id + '.mp4')]); let fc = P.map((p, i) => `[${i}:v]settb=AVTB,fps=${FPS},format=yuv420p,setsar=1[s${i}]`).join(';');
+  const ins = P.flatMap(p => ['-i', path.join(OUT, 'clipes', p.id + '.mp4')]); let fc = P.map((p, i) => `[${i}:v]fps=${FPS},settb=1/${FPS},format=yuv420p,setsar=1[s${i}]`).join(';');
   let cur = '[s0]', len = P[0].n / FPS;
   for (let i = 1; i < P.length; i++) { const p = P[i], o = `[v${i}]`;
-    if (p.entrada?.tipo === 'funde') { fc += `;${cur}[s${i}]xfade=transition=fade:duration=${p.entrada.dur}:offset=${(len - p.entrada.dur).toFixed(4)}${o}`; len += p.n / FPS - p.entrada.dur; }
-    else { fc += `;${cur}[s${i}]concat=n=2:v=1:a=0${o}`; len += p.n / FPS; }
+    if (p.entrada?.tipo === 'funde') { fc += `;${cur}[s${i}]xfade=transition=fade:duration=${p.entrada.dur}:offset=${(len - p.entrada.dur).toFixed(4)},settb=1/${FPS}${o}`; len += p.n / FPS - p.entrada.dur; }
+    else { fc += `;${cur}[s${i}]concat=n=2:v=1:a=0,settb=1/${FPS}${o}`; len += p.n / FPS; }
     cur = o; }
   const video = path.join(OUT, 'video.mp4');
   ff([...ins, '-filter_complex', fc, '-map', cur, '-c:v', 'libx264', '-crf', 14, '-preset', 'medium', '-pix_fmt', 'yuv420p', video]);

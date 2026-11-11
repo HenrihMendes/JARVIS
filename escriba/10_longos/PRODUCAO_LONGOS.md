@@ -51,7 +51,7 @@
     3. capturar em JPEG em vez de PNG.
 - **Mídias** (quadros, mp3, mp4) **não vão para o Git**. A narração do cap. 0 também está guardada no ElevenLabs: flow `2MGWDdGu9YZZ9ik6RWt1`, sessão `wlCJqQfzONo1sPllfEi0`. Para baixar de novo **sem gastar créditos**, use `creative_get_flow_run_status`, que devolve a URL do áudio.
 
-## 3b. Proposta: pipeline de quadro-chave (🟡 pendente de aprovação, 11/11)
+## 3b. Pipeline de quadro-chave (✅ aprovado em 11/11)
 **Medido:**
 - O motor 3D renderiza **1 quadro 4K por plano**: 8 s (vale) a 48 s (mesa, contando a construção da cena). A câmera (zoom e deslocamento lento) é feita no ffmpeg.
 - **10 s de vídeo 1080p saíram em 7 s.** No 3D quadro a quadro, os mesmos 10 s levam ~6 min.
@@ -68,7 +68,19 @@
 - a paralaxe real (dá para simular depois, com 2 camadas renderizadas pelo motor);
 - os personagens ficam parados nos planos comuns.
 
-**Teste proposto:** refazer o cap. 0 neste pipeline com a narração já paga, e comparar com a versão antiga.
+**Teste feito (11/11): cap. 0 v2, aprovado para produção pelo fundador.**
+- `teste_relevo/diretor.js` lê `teste_relevo/planos/L01_cap0.json`.
+- Resultado: **11 planos** (antes eram 18), 57,2 s, mesma narração. Os 11 s do gancho são mais rápidos; depois, planos de 3 a 9 s.
+- **Render real:**
+  - 6 planos "anim" (30,7 s de vídeo): **~20 min**, cerca de 40 s de render por segundo de vídeo;
+  - 5 planos "quadro" (21,4 s de vídeo): **~36 s** no total, cerca de 1,7 s de render por segundo de vídeo.
+- **Estimativa corrigida para 10 min com ~15% de animação:** ~1 h a 1h15. É bem menos que as 6 a 7 h, mas mais que os 45 min estimados antes, porque a animação domina o tempo.
+- **Pendente:**
+  - P08 (as 3 provas na mesa) espera as fotos. O Wikimedia bloqueia o download (429, "robot policy") porque a ferramenta não se identifica com um contato. O fundador precisa autorizar o contato a usar.
+  - Sem as fotos, a prévia saiu com um aviso no lugar do P08 (`out/L01_cap0_v2_previa_abertura.mp4`).
+- **Comandos:**
+  - render: `node diretor.js planos/L01_cap0.json` (retomável), ou `node diretor.js planos/L01_cap0.json P08` para um plano só;
+  - montagem: `VIDEO=out_v2/cap0/video.mp4 SUF=_v2 ./montar_cap0.sh`.
 
 ## 4. Estado do L01 "O caso Davi"
 - ✅ **Cap. 0 (abertura, 57 s)** pronto no estilo antigo (argila lisa). A refazer em low poly e mais lento, sem gerar a narração de novo.
