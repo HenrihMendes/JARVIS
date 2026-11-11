@@ -51,6 +51,25 @@
     3. capturar em JPEG em vez de PNG.
 - **Mídias** (quadros, mp3, mp4) **não vão para o Git**. A narração do cap. 0 também está guardada no ElevenLabs: flow `2MGWDdGu9YZZ9ik6RWt1`, sessão `wlCJqQfzONo1sPllfEi0`. Para baixar de novo **sem gastar créditos**, use `creative_get_flow_run_status`, que devolve a URL do áudio.
 
+## 3b. Proposta: pipeline de quadro-chave (🟡 pendente de aprovação, 11/11)
+**Medido:**
+- O motor 3D renderiza **1 quadro 4K por plano**: 8 s (vale) a 48 s (mesa, contando a construção da cena). A câmera (zoom e deslocamento lento) é feita no ffmpeg.
+- **10 s de vídeo 1080p saíram em 7 s.** No 3D quadro a quadro, os mesmos 10 s levam ~6 min.
+- Estimativa para 10 min (~75 planos): ~40 a 50 min, contra 6 a 7 h.
+
+**Como funciona:**
+- **Planos comuns:** 1 quadro 4K do motor (ou foto, ou documento) + movimento no ffmpeg.
+- **Planos de herói:** movimento 3D real só em 5 a 10 planos por vídeo, sobretudo no gancho (primeiros 15 a 30 s), no carimbo e nos objetos que se desfazem.
+- **Cenas novas:** imagem low poly gerada no ElevenLabs, usando os renders do motor como referência de estilo. Isso evita código novo por cena. O custo por imagem ainda precisa ser medido.
+- **Cenários-mestre:** mesa do Escriba, Tabuleta, vale, selos e contador são renderizados uma vez e reaproveitados em todos os vídeos.
+- **Shorts:** cada testemunha vira 1 Short em 9:16, com o mesmo material.
+
+**O que se perde:**
+- a paralaxe real (dá para simular depois, com 2 camadas renderizadas pelo motor);
+- os personagens ficam parados nos planos comuns.
+
+**Teste proposto:** refazer o cap. 0 neste pipeline com a narração já paga, e comparar com a versão antiga.
+
 ## 4. Estado do L01 "O caso Davi"
 - ✅ **Cap. 0 (abertura, 57 s)** pronto no estilo antigo (argila lisa). A refazer em low poly e mais lento, sem gerar a narração de novo.
 - 🟡 **Caps. 1 a 8:** o **texto v3 está pronto para aprovação** em `L01_o-caso-davi/roteiro_v3_producao.md`. Tem 1.201 palavras, e o vídeo fica em ≈ 9:50 a 10:10.
