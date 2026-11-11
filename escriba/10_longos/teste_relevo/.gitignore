@@ -9,3 +9,5 @@ overlay.ffconcat
 *.wav
 *.mp3
 *.mp4
+frames0/
+prev0/

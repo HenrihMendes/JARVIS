@@ -76,6 +76,12 @@ export function figura(ppu, sp) {
   // cobertura
   if (sp.cabeca === 'elmo') { L.raise(c => poly(c, [P(-0.11, 1.5), P(0.12, 1.52), P(0.03, 1.79)]), h(0.71), bl(2)); L.incise(c => line(c, P(-0.1, 1.545), P(0.11, 1.565), S(0.015)), 0.3, bl(0.6)); }
   if (sp.cabeca === 'gorro') { L.raise(c => smooth(c, [P(-0.11, 1.5), P(0.11, 1.52), P(0.06, 1.63), P(-0.07, 1.63)]), h(0.66), bl(2)); }
+  if (sp.cabeca === 'diadema') {
+    L.raise(c => smooth(c, [P(-0.12, 1.5), P(-0.02, 1.6), P(0.1, 1.56), P(0.12, 1.48), P(0.02, 1.52), P(-0.1, 1.42)]), h(0.62), bl(2));
+    L.incise(c => dots(c, X(-0.11), X(0.1), Y(1.45), Y(1.6), S(0.028), S(0.01)), 0.3, bl(0.6));
+    L.raise(c => poly(c, [P(-0.11, 1.55), P(0.11, 1.57), P(0.11, 1.61), P(-0.11, 1.59)]), h(0.74), bl(1.5));
+    L.raise(c => { for (let k = 0; k < 5; k++) poly(c, [P(-0.1 + k * 0.05, 1.59), P(-0.085 + k * 0.05, 1.68), P(-0.07 + k * 0.05, 1.6)]); }, h(0.74), bl(1.2));
+  }
   if (sp.cabeca === 'coroa') {
     L.raise(c => poly(c, [P(-0.105, 1.52), P(0.115, 1.535), P(0.085, 1.82), P(0.03, 1.9), P(-0.075, 1.8)]), h(0.73), bl(2));
     L.raise(c => poly(c, [P(-0.11, 1.52), P(0.12, 1.535), P(0.115, 1.6), P(-0.105, 1.585)]), h(0.78), bl(1.5)); // diadema
@@ -122,6 +128,12 @@ export function figura(ppu, sp) {
     L.raise(c => { c.lineWidth = S(0.028); line(c, P(0.28, 0.2), P(0.28, 2.15)); }, h(0.74), bl(1.2));
     L.raise(c => ell(c, X(0.28), Y(2.22), S(0.12), S(0.12)), h(0.82), bl(2));
     L.incise(c => { c.lineWidth = S(0.018); path(c, [P(0.28, 2.32), P(0.24, 2.24), P(0.31, 2.2), P(0.25, 2.12)]); path(c, [P(0.24, 2.24), P(0.2, 2.18)]); path(c, [P(0.31, 2.2), P(0.36, 2.16)]); }, 0.4, bl(0.6)); // raio (símbolo de Hadad)
+  }
+  if (arma === 'lira') { // lira apoiada no peito, braço da frente dedilhando
+    L.raise(c => { c.lineWidth = S(0.035); path(c, [P(0.12, 0.98), P(0.3, 1.0), P(0.42, 1.42)]); path(c, [P(0.12, 0.98), P(0.16, 1.4)]); line(c, P(0.13, 1.42), P(0.45, 1.46)); }, h(0.8), bl(1.4));
+    L.raise(c => smooth(c, [P(0.1, 0.92), P(0.32, 0.94), P(0.3, 1.06), P(0.13, 1.06)]), h(0.84), bl(2));
+    L.raise(c => { c.lineWidth = S(0.008); for (let k = 0; k < 6; k++) line(c, P(0.16 + k * 0.045, 1.05), P(0.18 + k * 0.045, 1.43)); }, h(0.76), bl(0.8));
+    L.raise(c => { limb(c, P(0.04, 1.28), P(0.18, 1.16), S(0.05), S(0.042)); limb(c, P(0.18, 1.16), P(0.3, 1.2), S(0.042), S(0.035)); }, h(0.88), bl(2.5));
   }
   if (arma === 'cinzel') { // braço da frente com cinzel (o do martelo é peça separada)
     L.raise(c => { limb(c, P(0.04, 1.28), P(0.22, 1.12), S(0.05), S(0.042)); limb(c, P(0.22, 1.12), P(0.4, 1.2), S(0.042), S(0.035)); }, h(0.7), bl(2.5));
@@ -342,4 +354,82 @@ export function placaTitulo(ppu, w = 6, hgt = 2.6, texto = 'O CASO DAVI', marcad
     L.incise(c => { c.save(); c.translate(w / 2, hgt * 0.21); c.scale(1, -1); c.font = `600 0.17px "IBM Plex Mono"`; c.textAlign = 'center'; c.fillText('DEBAIXO DA TERRA  ·  LONGO Nº 01', 0, 0); c.restore(); }, 0.35, 1);
   }
   return L;
+}
+
+// ---------- cidade no alto do morro (Jerusalém, relevo) ----------
+export function cidadeMorro(ppu, w = 12, hgt = 6.5) {
+  const L = new Layer(w, hgt, ppu); const r = rng(14);
+  L.raise(c => { const pts = [[0, 0]]; for (let i = 0; i <= 30; i++) { const x = i / 30 * w; pts.push([x, 1.2 + 1.9 * Math.exp(-Math.pow((x - w * 0.5) / (w * 0.28), 2)) + Math.sin(i * 1.7) * 0.06]); } pts.push([w, 0]); poly(c, pts); }, 0.35, 5);
+  L.incise(c => { c.lineWidth = 0.02; for (let k = 0; k < 7; k++) { const y = 0.4 + k * 0.32; const pts = []; for (let x = 0; x <= w; x += 0.3) pts.push([x, y + Math.sin(x * 0.9 + k) * 0.05]); curve(c, pts); } }, 0.18, 1.2);
+  const cx = w * 0.5, base = 2.9;
+  L.raise(c => { c.fillRect(cx - 2.6, base - 0.2, 5.2, 1.0); for (let k = 0; k < 11; k++) c.fillRect(cx - 2.6 + k * 0.49, base + 0.8, 0.27, 0.22); for (const tx of [-2.75, -1.1, 0.6, 2.25]) { c.fillRect(cx + tx, base - 0.2, 0.55, 1.5); for (let k = 0; k < 3; k++) c.fillRect(cx + tx + k * 0.2, base + 1.3, 0.13, 0.18); } }, 0.62, 3);
+  L.raise(c => { for (let k = 0; k < 9; k++) { const x = cx - 2.0 + k * 0.48 + (r() - 0.5) * 0.1, hh = 0.35 + r() * 0.4; c.fillRect(x, base + 1.0, 0.36, hh); } }, 0.5, 3);
+  L.raise(c => { c.fillRect(cx - 0.5, base + 1.0, 1.0, 0.9); poly(c, [[cx - 0.6, base + 1.9], [cx + 0.6, base + 1.9], [cx, base + 2.25]]); }, 0.7, 3); // edifício alto
+  L.incise(c => { c.lineWidth = 0.012; for (let y = base - 0.1; y < base + 0.8; y += 0.13) line(c, [cx - 2.6, y], [cx + 2.6, y]); c.beginPath(); c.arc(cx, base - 0.2, 0.3, 0, Math.PI); c.fill(); }, 0.3, 1);
+  return L;
+}
+
+// ---------- documento: papiro com tinta (colTex + inkTex + ordem de revelação) ----------
+function papiroBase(ppu, w, hgt, seed) {
+  const L = new Layer(w, hgt, ppu); const r = rng(seed);
+  L.raise(c => c.fillRect(0, 0, w, hgt), 0.25, 0);
+  L.incise(c => { for (let i = 0; i < 2400; i++) { c.lineWidth = 0.003 + r() * 0.006; const y = r() * hgt, x = r() * w; line(c, [x, y], [x + 0.2 + r() * 0.6, y + (r() - 0.5) * 0.01]); } }, 0.08, 1);
+  L.incise(c => { for (let i = 0; i < 800; i++) { c.lineWidth = 0.003 + r() * 0.005; const y = r() * hgt, x = r() * w; line(c, [x, y], [x + (r() - 0.5) * 0.01, y + 0.2 + r() * 0.5]); } }, 0.06, 1);
+  const cor = document.createElement('canvas'); cor.width = L.W; cor.height = L.H; const cx = cor.getContext('2d'); L.world(cx);
+  const g = cx.createRadialGradient(w / 2, hgt / 2, 0.5, w / 2, hgt / 2, w * 0.7); g.addColorStop(0, '#f1e6d2'); g.addColorStop(1, '#c4ad86'); cx.fillStyle = g; cx.fillRect(0, 0, w, hgt);
+  for (let i = 0; i < 140; i++) { cx.fillStyle = `rgba(${120 + r() * 40},${90 + r() * 30},50,${0.03 + r() * 0.04})`; ell(cx, r() * w, r() * hgt, 0.04 + r() * 0.18, 0.03 + r() * 0.12); }
+  const tinta = document.createElement('canvas'); tinta.width = L.W; tinta.height = L.H; const tx = tinta.getContext('2d'); L.world(tx);
+  return { L, cor, tinta, tx, ordem: new Mask(L) };
+}
+const txt = (tx, s, x, y, font, color, align = 'left') => { tx.save(); tx.translate(x, y); tx.scale(1, -1); tx.font = font; tx.fillStyle = color; tx.textAlign = align; tx.fillText(s, 0, 0); tx.restore(); };
+// linha do tempo: "c. 1000 a.C. — Davi"  ...vazio...  "1990"; a linha se desenha (ordem 0..0.8)
+export function linhaTempo(ppu, w = 8, hgt = 4.5) {
+  const P = papiroBase(ppu, w, hgt, 31); const { tx, ordem } = P; const y = 2.1, x0 = 0.9, x1 = 7.1;
+  tx.strokeStyle = 'rgba(40,30,22,0.9)'; tx.lineWidth = 0.035; line(tx, [x0, y], [x1, y]); ordem.draw(c => line(c, [x0, y], [x1, y], 0.08), 0.05, 0, 'source-over');
+  for (let k = 0; k < 40; k++) { const x = x0 + (x1 - x0) * k / 39; ordem.draw(c => c.fillRect(x - 0.08, y - 0.1, (x1 - x0) / 39 + 0.16, 0.2), 0.05 + 0.6 * k / 39, 0, 'source-over'); }
+  tx.fillStyle = 'rgba(40,30,22,0.95)'; ell(tx, x0, y, 0.07, 0.07); ell(tx, x1, y, 0.07, 0.07);
+  txt(tx, 'c. 1000 a.C.', x0, y - 0.42, '600 0.2px "IBM Plex Mono"', 'rgba(40,30,22,0.95)', 'center'); txt(tx, 'DAVI', x0, y + 0.3, '900 0.34px "Fraunces"', 'rgba(150,30,20,0.95)', 'center');
+  txt(tx, '1990', x1, y - 0.42, '600 0.2px "IBM Plex Mono"', 'rgba(40,30,22,0.95)', 'center');
+  // marcas de "nada" ao longo da linha: pequenos traços vazios
+  for (let k = 1; k < 9; k++) { const x = x0 + (x1 - x0) * k / 9; tx.lineWidth = 0.02; line(tx, [x, y - 0.1], [x, y + 0.1]); }
+  txt(tx, 'nenhuma prova fora da Bíblia', (x0 + x1) / 2, y + 0.5, 'italic 400 0.26px "Fraunces"', 'rgba(40,30,22,0.85)', 'center'); ordem.draw(c => c.fillRect((x0 + x1) / 2 - 2.2, y + 0.35, 4.4, 0.45), 0.72, 0, 'source-over');
+  return P;
+}
+// "DAVI: LENDA?" escrito a tinta
+export function papiroLenda(ppu, w = 8, hgt = 4.5) {
+  const P = papiroBase(ppu, w, hgt, 41); const { tx, ordem } = P;
+  txt(tx, 'DAVI', w / 2, 2.45, '900 1.1px "Fraunces"', 'rgba(40,30,22,0.95)', 'center');
+  txt(tx, 'lenda?', w / 2 + 0.2, 1.45, 'italic 400 0.9px "Fraunces"', 'rgba(150,30,20,0.95)', 'center'); ordem.draw(c => c.fillRect(w / 2 - 1.6, 1.15, 3.6, 0.95), 0.5, 0, 'source-over');
+  tx.strokeStyle = 'rgba(150,30,20,0.9)'; tx.lineWidth = 0.05; curve(tx, [[w / 2 - 1.6, 1.12], [w / 2, 1.02], [w / 2 + 1.8, 1.1]]); ordem.draw(c => c.fillRect(w / 2 - 1.7, 0.95, 3.6, 0.22), 0.7, 0, 'source-over');
+  return P;
+}
+
+// ---------- corte de estratos em relevo (cor por camada) + fragmento de basalto no fundo ----------
+export function estratosRelevo(ppu, w = 6, hgt = 10, fragmento = null) {
+  const L = new Layer(w, hgt, ppu); const r = rng(77);
+  const cor = document.createElement('canvas'); cor.width = L.W; cor.height = L.H; const cx = cor.getContext('2d'); L.world(cx);
+  const cores = ['#8a6a44', '#4e3c2e', '#b0a286', '#6e5440', '#3a2c24', '#9a7448', '#c4b38e', '#7a4e30', '#5a4a3a', '#a08458', '#65503c'];
+  let y = hgt; let k = 0; const faixas = [];
+  while (y > 0) { const h = 0.25 + r() * 0.5; const y0 = Math.max(0, y - h); faixas.push([y0, y, k]);
+    const base = 0.3 + (k % 3) * 0.08 + r() * 0.06; const tipo = (r() * 4) | 0;
+    // borda ondulada da camada
+    const borda = []; for (let x = 0; x <= w + 0.2; x += 0.2) borda.push([x, y0 + Math.sin(x * 1.7 + k) * 0.04 + (r() - 0.5) * 0.03]);
+    const forma = (c) => { c.beginPath(); c.moveTo(0, y); c.lineTo(w, y); for (let i = borda.length - 1; i >= 0; i--) c.lineTo(borda[i][0], borda[i][1]); c.closePath(); c.fill(); };
+    L.raise(forma, base, 3, 'source-over');
+    cx.fillStyle = cores[k % cores.length]; forma(cx);
+    if (tipo === 0) L.raise(c => { for (let i = 0; i < 260; i++) { const px = r() * w, py = y0 + r() * (y - y0); ell(c, px, py, 0.01 + r() * 0.025, 0.008 + r() * 0.02); } }, base + 0.12, 1.5); // cascalho
+    if (tipo === 1) L.incise(c => { c.lineWidth = 0.008; for (let i = 0; i < 18; i++) { const px = r() * w, py = y0 + r() * (y - y0); line(c, [px, py], [px + (r() - 0.5) * 0.4, py + (r() - 0.5) * 0.1]); } }, 0.3, 1); // rachaduras
+    if (tipo === 2) L.raise(c => { for (let i = 0; i < 9; i++) { const px = r() * w, py = y0 + 0.08 + r() * (y - y0 - 0.16); ell(c, px, py, 0.06 + r() * 0.1, 0.04 + r() * 0.06, r() * 3); } }, base + 0.22, 3); // pedras
+    // achados: cacos curvos, ossos e moedas
+    for (let i = 0; i < 3; i++) { const px = 0.3 + r() * (w - 0.6), py = y0 + 0.08 + r() * Math.max(0.01, y - y0 - 0.16), q = r();
+      if (q < 0.5) { L.raise(c => { c.lineWidth = 0.035; c.beginPath(); c.arc(px, py, 0.14 + r() * 0.08, 0.3 + r(), 1.6 + r()); c.stroke(); }, base + 0.28, 1.5); cx.strokeStyle = '#b5532c'; cx.lineWidth = 0.04; cx.beginPath(); cx.arc(px, py, 0.16, 0.5, 1.9); cx.stroke(); }
+      else if (q < 0.8) { L.raise(c => { c.lineWidth = 0.03; line(c, [px - 0.12, py], [px + 0.12, py + 0.03]); ell(c, px - 0.13, py, 0.03, 0.03); ell(c, px + 0.13, py + 0.03, 0.03, 0.03); }, base + 0.25, 1.2); cx.fillStyle = '#e2d6bc'; ell(cx, px, py + 0.015, 0.14, 0.03); }
+      else { L.raise(c => ell(c, px, py, 0.04, 0.04), base + 0.3, 1.2); cx.fillStyle = '#b08a3a'; ell(cx, px, py, 0.045, 0.045); } }
+    y = y0; k++; }
+  // ruído de cor por camada
+  for (let i = 0; i < 1500; i++) { cx.fillStyle = `rgba(${r() < 0.5 ? 20 : 230},${r() < 0.5 ? 15 : 210},10,${0.03 + r() * 0.05})`; ell(cx, r() * w, r() * hgt, 0.01 + r() * 0.05, 0.01 + r() * 0.04); }
+  if (fragmento) { const { L: F, x, y: fy } = fragmento; L.stamp(F, x, fy, 'source-over'); cx.save(); cx.setTransform(1, 0, 0, 1, 0, 0); cx.globalAlpha = 1; const tmp = document.createElement('canvas'); tmp.width = F.W; tmp.height = F.H; const tc = tmp.getContext('2d'); const d = F.x.getImageData(0, 0, F.W, F.H); const id = tc.createImageData(F.W, F.H);
+    for (let i = 0; i < d.data.length; i += 4) { const v = d.data[i]; const on = v > 20; id.data[i] = 30 + v * 0.12; id.data[i + 1] = 30 + v * 0.12; id.data[i + 2] = 36 + v * 0.14; id.data[i + 3] = on ? 255 : 0; }
+    tc.putImageData(id, 0, 0); cx.drawImage(tmp, Math.round(x * L.ppu), Math.round(L.H - (fy + F.h) * L.ppu)); cx.restore(); }
+  return { L, cor };
 }
