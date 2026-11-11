@@ -2,7 +2,7 @@
 
 > **Status:** estudo concluído, nada foi instalado nem executado no seu computador.
 > **Data:** 11/11/2026
-> **Base da análise:** código-fonte real do OpenJarvis (commit `6201505`, 11/11/2026), documentação oficial, issues abertas no GitHub, e o código de um projeto público que segue o mesmo guia do vídeo.
+> **Base da análise:** código-fonte real do OpenJarvis (commit `6201505`, 11/11/2026), documentação oficial, issues abertas no GitHub, e o código de um projeto público de terceiros construído sobre o OpenJarvis (usado só como exemplo).
 > **Próximo passo:** você aprova (ou corta) o plano da seção 12, e só depois começamos.
 
 ---
@@ -10,7 +10,7 @@
 ## Sumário
 
 1. [Veredito em uma página](#1-veredito-em-uma-página)
-2. [O vídeo: o que ele realmente mostra](#2-o-vídeo-o-que-ele-realmente-mostra)
+2. [O vídeo de referência e um exemplo real](#2-o-vídeo-de-referência-e-um-exemplo-real)
 3. [O que é o OpenJarvis (pelo código, não pelo marketing)](#3-o-que-é-o-openjarvis-pelo-código-não-pelo-marketing)
 4. [O que o OpenJarvis já oferece](#4-o-que-o-openjarvis-já-oferece)
 5. [O que aparece no vídeo e não existe nativamente](#5-o-que-aparece-no-vídeo-e-não-existe-nativamente)
@@ -22,43 +22,42 @@
 11. [Limitações técnicas (o que não vai ficar igual ao filme)](#11-limitações-técnicas-o-que-não-vai-ficar-igual-ao-filme)
 12. [Plano de implementação por etapas](#12-plano-de-implementação-por-etapas)
 13. [Seus pontos cegos](#13-seus-pontos-cegos)
-14. [Decisões que preciso de você](#14-decisões-que-preciso-de-você)
+14. [Decisões](#14-decisões)
 15. [Fontes](#15-fontes)
 
 ---
 
 ## 1. Veredito em uma página
 
-**1. O vídeo não mostra o OpenJarvis puro.** As duas palmas, o "Olá, Jarvis", o jingle, o painel "holográfico" e as ações no computador **não existem no OpenJarvis**. São scripts que o Claude Code escreve por cima dele, a partir de um prompt de um guia brasileiro (@marcondes.ai). Procurei no código-fonte inteiro do OpenJarvis por *wake word*, *hotword*, *clap*, *porcupine*, *openwakeword* e *VAD*: **zero resultados** fora de um e-mail fictício num conjunto de testes.
+**1. Palmas, palavra de ativação, painel futurista e ações no Windows não existem no OpenJarvis.** Procurei no código-fonte inteiro por *wake word*, *hotword*, *clap*, *porcupine*, *openwakeword* e *VAD*: **zero resultados** fora de um e-mail fictício num conjunto de testes. Qualquer vídeo que mostre isso usa código extra construído por cima do OpenJarvis.
 
-**2. "100% local e sem mensalidade" é falso no exemplo real.** Li o código de um projeto público que segue esse guia ([enricomed/Jarvis-](https://github.com/enricomed/Jarvis-)). Nele, qualquer pedido com palavras como "hoje", "agora", "clima", "agenda", "e-mail" ou "arquivo" vai para a **API paga da Anthropic (Claude Opus 5.5)**. Sem a chave paga, o assistente responde: *"Para pesquisar ou executar tarefas, falta configurar a chave da nuvem"*. O modelo local só faz conversa simples.
+**2. Desconfie de "100% local e sem mensalidade".** Não tive acesso ao seu vídeo. Mas analisei o código de um projeto público de terceiros que monta esses mesmos efeitos sobre o OpenJarvis. Nele, qualquer pedido com palavras como "hoje", "agora", "clima", "agenda", "e-mail" ou "arquivo" vai para a **API paga da Anthropic (Claude Opus 5.5)**. Sem a chave paga, o assistente responde: *"Para pesquisar ou executar tarefas, falta configurar a chave da nuvem"*. O modelo local só faz conversa simples. É o padrão mais comum nesse tipo de demonstração.
 
-**3. As palmas são um truque frágil.** No exemplo, "palma" é: pico de volume acima de um limiar e 6 vezes acima do ruído, com duas ocorrências entre 0,12 s e 0,80 s. Uma batida na mesa ou uma porta fechando também disparam. Funciona em vídeo, falha no dia a dia.
+**3. Palmas detectadas só por volume são frágeis.** Nesse projeto, "palma" é: pico de volume acima de um limiar e 6 vezes acima do ruído, com duas ocorrências entre 0,12 s e 0,80 s. Uma batida na mesa ou uma porta fechando também disparam. Funciona em vídeo, falha no dia a dia.
 
 **4. O OpenJarvis é bom, mas é para outra coisa.** É um framework de **pesquisa** de Stanford (status "Alpha"), com cerca de 179 mil linhas de Python. O foco é medir energia, custo e desempenho de IA local. Ele traz muita coisa que você não precisa (mineração de criptomoeda, 32 canais de chat, benchmarks). E é fraco exatamente no que você quer: voz contínua, português, Windows e segurança das ações.
 
-**5. Minha recomendação:** **não usar o OpenJarvis como base do produto.** Usar como **referência de estudo** e construir um núcleo próprio, enxuto, Windows-first e pt-BR-first, com as mesmas peças de código aberto que o OpenJarvis usa por baixo (Ollama, faster-whisper, Kokoro) mais as que faltam nele (openWakeWord, Silero VAD, motor de permissões, interface própria).
+**5. Minha recomendação original:** **não usar o OpenJarvis como base do produto.** Usar como **referência de estudo** e construir um núcleo próprio, enxuto, Windows-first e pt-BR-first, com as mesmas peças de código aberto que o OpenJarvis usa por baixo (Ollama, faster-whisper, Kokoro) mais as que faltam nele (openWakeWord, Silero VAD, motor de permissões, interface própria).
+
+> **Decisão tomada (11/11/2026):** o OpenJarvis **será a base**, com as condições da seção 14. A arquitetura da seção 8 será ajustada quando chegarem os dados do notebook.
 
 **6. A maior incógnita é o seu notebook.** Não consigo enxergá-lo deste ambiente (estou num container na nuvem). Sem saber GPU e RAM, não dá para prometer IA local boa. A seção 7 traz comandos **somente leitura** para você rodar. O resultado decide se o "cérebro" pode ser 100% local ou se precisa de um plano híbrido.
 
-**7. Custo:** dá para ter **R$ 0/mês** com tudo local, aceitando um assistente mais lento e menos inteligente que o do vídeo. Um plano híbrido sensato (local por padrão, nuvem só quando você autorizar) fica em **poucos dólares por mês** (seção 10).
+**7. Custo:** dá para ter **R$ 0/mês** com tudo local, aceitando um assistente mais lento e menos inteligente que os de demonstração. Um plano híbrido sensato (local por padrão, nuvem só quando você autorizar) fica em **poucos dólares por mês** (seção 10).
 
 ---
 
-## 2. O vídeo: o que ele realmente mostra
+## 2. O vídeo de referência e um exemplo real
 
 ### 2.1 Limitação desta análise
 
-**Você não anexou o vídeo nem um link para ele.** E mesmo com o link, eu não consigo assistir a vídeos. O que fiz foi rastrear a origem:
+**Não tive acesso ao vídeo**, e eu não consigo assistir a vídeos. Por isso este estudo **não descreve o vídeo**. Ele parte do que você contou no pedido (ativação por duas palmas, "bom dia" com briefing, interface futurista) e verifica, no código, o que o OpenJarvis tem ou não tem. Essa parte vale para qualquer vídeo.
 
-- Um guia em português ("O seu JARVIS no PC ou no celular", de @marcondes.ai) descreve exatamente o fluxo: instalar o OpenJarvis, usar Ollama com um modelo Gemma, voz em português, e um comando `jarvis-show` que "ouve o microfone, detecta duas palmas seguidas, toca um jingle, abre a interface web e inicia a conversa por voz". Segundo a busca, o próprio guia diz que palmas e jingle **não são do OpenJarvis oficial**: são um comando que o Claude Code escreve no passo 9 do prompt. Não consegui abrir a página diretamente (bloqueio de rede deste ambiente); os trechos vêm dos resultados de busca.
-- O projeto [enricomed/Jarvis-](https://github.com/enricomed/Jarvis-) declara no README: *"Base: OpenJarvis (Stanford), seguindo o guia do @marcondes.ai"*. Clonei e li o código inteiro. É a melhor evidência disponível do que o vídeo de fato roda.
+Para entender **como** esses efeitos costumam ser feitos, analisei um projeto público de terceiros construído sobre o OpenJarvis ([enricomed/Jarvis-](https://github.com/enricomed/Jarvis-)). Ele serve só como exemplo de implementação: **não tem relação com o seu projeto** e não será usado nele.
 
-**Se o seu vídeo for outro**, me mande o link ou descreva as cenas, e eu ajusto esta seção. O resto do estudo continua válido.
+### 2.2 Como esses efeitos são feitos num exemplo real
 
-### 2.2 Funcionalidade por funcionalidade (com base no código do exemplo)
-
-| O que aparece | Como é feito de verdade | Nativo do OpenJarvis? | Arquivo de evidência |
+| Funcionalidade | Como é feita nesse exemplo | Nativo do OpenJarvis? | Arquivo de evidência |
 |---|---|---|---|
 | Ativação por **duas palmas** | Pico de amplitude ≥ limiar e > 6× o ruído de fundo; 2 picos entre 0,12 s e 0,80 s; 80 ms de refratário. Tem modo `--calibrar`. Sem IA, só limiar de volume. | **Não** | `scripts/jarvis_show.py`, função `esperar_duas_palmas` |
 | **Jingle** de abertura | Toca `voz/jingle.mp3` se existir | **Não** | `jarvis_show.py`, `tocar_jingle` |
@@ -74,7 +73,7 @@
 
 ### 2.3 O que isso significa para você
 
-O vídeo é uma **demonstração montada**: o OpenJarvis entra com STT, TTS, chamada ao Ollama e personas. O efeito "uau" (palmas, jingle, painel, ações) é cola feita pelo Claude Code, e a parte inteligente de verdade (pesquisar, agir) roda **na nuvem paga**. Não há nada de errado nisso como protótipo. Mas não é o produto "local, privado e grátis" que o vídeo sugere.
+Nesse exemplo, o OpenJarvis entra com STT, TTS, chamada ao Ollama e personas. O efeito "uau" (palmas, jingle, painel, ações) é código extra, e a parte inteligente de verdade (pesquisar, agir) roda **na nuvem paga**. Não há nada de errado nisso como protótipo. Mas não é um produto "local, privado e grátis". Vale conferir se o seu vídeo de referência não esconde a mesma coisa.
 
 Um detalhe preocupante no exemplo: o documento `docs/SEGURANCA-LGPD.md` afirma *"nada sai do seu computador"*, enquanto o código manda para a nuvem qualquer frase com "hoje", "agenda" ou "e-mail" quando a chave está configurada. **Documentação e código se contradizem.** É exatamente o tipo de coisa que precisamos evitar.
 
@@ -210,6 +209,8 @@ Três camadas reais no código:
 
 ## 5. O que aparece no vídeo e não existe nativamente
 
+Com base no que você descreveu do vídeo (palmas, "bom dia", interface futurista, execução de tarefas).
+
 | Funcionalidade | Precisa de | Dificuldade |
 |---|---|---|
 | Duas palmas | Detector de eventos sonoros (limiar + verificação por IA, ex.: YAMNet) | Média |
@@ -218,7 +219,7 @@ Três camadas reais no código:
 | Interromper o Jarvis enquanto ele fala | Cancelamento de eco (AEC) ou fone de ouvido | **Alta** (seção 11) |
 | Jingle | Tocar um arquivo | Trivial |
 | Painel futurista | Interface própria (WebGL/Three.js) ligada aos estados do núcleo | Alta (é design + engenharia) |
-| Pesquisa na internet "inteligente" | No vídeo: Claude pago. Local: modelo + ferramenta de busca, com resultado pior | Média |
+| Pesquisa na internet "inteligente" | No exemplo analisado: Claude pago. Local: modelo + ferramenta de busca, com resultado pior | Média |
 | Ações no computador | Ferramentas Windows + motor de permissões + confirmação | Alta (segurança) |
 | "Bom dia" instantâneo | Pré-calcular o briefing em horário agendado | Média |
 
@@ -323,7 +324,7 @@ Estimativas baseadas em guias de terceiros; os números variam por quantização
 | **A.** 8 GB RAM, sem GPU dedicada | `qwen3.5:2b` ou `gemma4:e2b`, lentos e limitados | Whisper `base`/`small` + Piper ou Kokoro na CPU: ok | **Híbrido obrigatório** para agir e pesquisar. Local só para voz e conversa simples. |
 | **B.** 16 GB RAM, GPU integrada (Intel Iris/Arc, Radeon) | `qwen3.5:4b` ou `gemma4:e4b` na CPU/iGPU. Um teste com iGPU Intel Xe relata ~8–13 tokens/s em modelos de 2–3B e dificuldade com 9B. | ok | Funciona, mas a resposta vai demorar alguns segundos. Ferramentas complexas falham mais. Híbrido recomendado. |
 | **C.** 16 GB RAM + NVIDIA 6–8 GB VRAM (RTX 3050/4050/4060) | `qwen3.5:9b` ou `gemma4:e4b` na GPU | Whisper `small`/`medium` na GPU | **Bom.** Dá para ser local por padrão. |
-| **D.** 32 GB RAM + 12 GB VRAM ou mais | Modelos de 14B–27B (quantizados) | Whisper `large-v3-turbo` | Excelente, perto do vídeo em inteligência |
+| **D.** 32 GB RAM + 12 GB VRAM ou mais | Modelos de 14B–27B (quantizados) | Whisper `large-v3-turbo` | Excelente, perto das demonstrações em inteligência |
 
 **Orçamento de memória típico** (perfil B, 16 GB): Windows e apps ~5 GB; modelo 4B quantizado com 8k de contexto ~4–5 GB; Whisper `small` int8 ~1 GB; Kokoro ~0,5–1 GB; interface ~0,3 GB. Sobram ~4 GB. Cabe, mas com o navegador cheio de abas começa a trocar memória com o disco.
 
@@ -398,7 +399,7 @@ Estimativas baseadas em guias de terceiros; os números variam por quantização
    - **fora da lista** → recusa e registra.
 7. **Notificando:** lembretes e alertas viram notificação do Windows e cartão na interface.
 
-### 8.4 Defesa contra prompt injection (o ponto que o vídeo ignora)
+### 8.4 Defesa contra prompt injection (o ponto que as demonstrações ignoram)
 
 Quando o contexto contém conteúdo externo (e-mail, página, notícia), o orquestrador **desliga as ferramentas de escrita e as sensíveis** naquele turno. O modelo pode resumir o e-mail, mas não pode agir com base nele sem um novo pedido seu. É uma regra simples, no código e não no prompt, e fecha a maior brecha desse tipo de assistente.
 
@@ -450,8 +451,8 @@ O repositório **Sexta-Feira** atual é um site imobiliário (Astro) sem relaç�
 | Modelo local | **Qwen 3.5 (4B/9B)** ou **Gemma 4 (E2B/E4B)**: decidir por teste em pt-BR | Ambos com bom multilinguismo; escolha por medição, não por fama | — | verificar a licença de cada um na Etapa 0 |
 | Fala → texto | **faster-whisper** (`small` ou `medium`, int8, `language="pt"`) | Melhor custo-benefício local em português; já testado no Windows pelo OpenJarvis | whisper.cpp | MIT |
 | Fim da fala (VAD) | **Silero VAD** | Neural, leve, muito melhor que limiar de volume | WebRTC VAD | MIT |
-| Palavra de ativação | **openWakeWord** com modelo treinado para "Jarvis" | Local, grátis, roda em CPU. O **Porcupine** (Picovoice) **encerrou o plano gratuito em 30/06/2026**, segundo relatos de usuários; o plano pago "Foundation" custa ~US$ 6 mil/ano, segundo terceiros. | Whisper contínuo (como no vídeo): gasta CPU e transcreve tudo que você fala | código Apache 2.0; verificar a licença dos modelos pré-treinados |
-| Palmas | Detector de "ataque" sonoro + verificação com **YAMNet** (classe "Clapping") só nos candidatos | Corta os falsos positivos do limiar simples sem gastar CPU o tempo todo | Só limiar (como no vídeo) | Apache 2.0 |
+| Palavra de ativação | **openWakeWord** com modelo treinado para "Jarvis" | Local, grátis, roda em CPU. O **Porcupine** (Picovoice) **encerrou o plano gratuito em 30/06/2026**, segundo relatos de usuários; o plano pago "Foundation" custa ~US$ 6 mil/ano, segundo terceiros. | Whisper contínuo (como no exemplo analisado): gasta CPU e transcreve tudo que você fala | código Apache 2.0; verificar a licença dos modelos pré-treinados |
+| Palmas | Detector de "ataque" sonoro + verificação com **YAMNet** (classe "Clapping") só nos candidatos | Corta os falsos positivos do limiar simples sem gastar CPU o tempo todo | Só limiar (como no exemplo analisado) | Apache 2.0 |
 | Texto → fala | **Kokoro** (`pf_dora`/`pm_alex`) **vs. Piper** (`pt_BR-faber`, `jeff`): teste de audição na Etapa 0 | Os dois rodam em CPU; nenhum soa humano em pt-BR. Qwen3-TTS (clonagem de voz, pt-BR) é promissor, mas prefere GPU. | ElevenLabs (pago, muito mais natural) | Kokoro Apache 2.0; Piper: verificar (o repositório mudou de mantenedor) |
 | Memória | **SQLite** (FTS5 + `sqlite-vec`) | Um arquivo, zero servidor, persistente, fácil de fazer backup e de apagar | LanceDB | domínio público / MIT |
 | Embeddings | modelo multilíngue via Ollama (ex.: `bge-m3`) | Busca semântica em português | — | verificar |
@@ -500,7 +501,7 @@ Premissas: 30 pedidos/dia que vão para a nuvem, ~3 mil tokens de entrada e ~500
 |---|---|---|---|
 | Haiku 5.5 | ~US$ 0,50 | US$ 3 | **~US$ 3,50** |
 | Sonnet 5.5 | ~US$ 10 | US$ 3 | **~US$ 13** |
-| Opus 5.5 (o que o exemplo do vídeo usa) | ~US$ 20 | US$ 3 | **~US$ 23** |
+| Opus 5.5 (o que o exemplo analisado usa) | ~US$ 20 | US$ 3 | **~US$ 23** |
 
 **Ressalva honesta:** buscas e agentes leem páginas e resultados de ferramentas, o que pode multiplicar os tokens de entrada por 3 a 5 vezes. Trate esses números como **piso**, não teto. Some IOF e a cotação do dólar no cartão. A boa notícia: no desenho proposto, a nuvem é **desligada por padrão**, e dá para colocar um teto de gasto mensal no painel da Anthropic.
 
@@ -517,7 +518,7 @@ Tudo que é local. Se o notebook for perfil A ou B (seção 7.3), o custo "zero"
 3. **Voz natural em pt-BR local.** É o elo mais fraco. Kokoro e Piper são "bons para máquina", não humanos. Voz realmente natural hoje, em pt-BR, é paga e na nuvem.
 4. **Interromper o Jarvis enquanto ele fala** (*barge-in*). Com alto-falante e microfone do próprio notebook, o assistente **ouve a si mesmo**. Exige cancelamento de eco, que não é confiável em todo hardware. Solução prática: **fone de ouvido** ou interromper por atalho ou pela palavra de ativação.
 5. **Palmas.** Mesmo com verificação por IA, palmas vão ter falsos positivos e negativos. Recomendo a palavra de ativação como principal e palmas como "modo show", opcional.
-6. **Microfone sempre ligado.** Consome bateria e CPU. Com openWakeWord o custo é baixo, mas não é zero. No vídeo, a abordagem "Whisper ouvindo tudo" é bem mais pesada.
+6. **Microfone sempre ligado.** Consome bateria e CPU. Com openWakeWord o custo é baixo, mas não é zero. No exemplo analisado, a abordagem "Whisper ouvindo tudo" é bem mais pesada.
 7. **Modelo residente na memória.** Para responder rápido, o modelo fica carregado (o exemplo do guia força isso a cada 4 minutos). São vários GB de RAM/VRAM ocupados o tempo todo. Precisaremos de um modo econômico.
 8. **Gmail e Google.** O token de 7 dias em modo teste e a possível exigência de verificação para escopos do Gmail são burocracia real do Google, não do projeto.
 9. **Antivírus e SmartScreen.** Executáveis não assinados (inclusive um app Tauri nosso) geram alertas. O próprio OpenJarvis tem issue de alerta do Defender.
@@ -551,7 +552,7 @@ Cada etapa termina com algo **funcionando e testável**, e só passamos para a p
 
 Você pediu um parceiro crítico, então aqui vai sem rodeio:
 
-1. **Você está se inspirando num vídeo que esconde o custo.** O "uau" do vídeo vem de uma API paga e de scripts de demonstração. Se o objetivo é "local, grátis e privado", o resultado vai ser **menos impressionante** que o vídeo, a menos que seu notebook tenha uma boa GPU NVIDIA.
+1. **Vídeos de demonstração costumam esconder custo e fragilidade.** No exemplo real que analisei, o "uau" vinha de uma API paga e de scripts de demonstração. Se o objetivo é "local, grátis e privado", o resultado vai ser **menos impressionante** que uma demonstração assim, a menos que seu notebook tenha uma boa GPU NVIDIA.
 2. **"Custo zero" e "qualidade de produto premium" competem entre si.** Você pode ter os dois só aceitando mais tempo de desenvolvimento e respostas mais lentas e simples. Decida qual vem primeiro.
 3. **Você pediu tudo ao mesmo tempo** (voz, memória, Gmail, agenda, notícias, automação, RAG, plugins, interface premium). É projeto de meses. O maior risco não é técnico: é abandonar no meio por excesso de escopo. Por isso o plano entrega valor por etapas.
 4. **Um assistente que lê e-mail e executa comandos é um alvo.** Quase todos os projetos "Jarvis" caseiros ignoram isso. Se pularmos o motor de permissões, um e-mail bem escrito pode mandar seu assistente apagar arquivos.
@@ -562,14 +563,30 @@ Você pediu um parceiro crítico, então aqui vai sem rodeio:
 
 ---
 
-## 14. Decisões que preciso de você
+## 14. Decisões
 
-1. **Hardware:** cole o resultado do diagnóstico da seção 7.2.
-2. **Base:** você concorda em **não** usar o OpenJarvis como base (só como referência)? Se quiser usá-lo mesmo assim, explico o caminho, mas com as ressalvas da seção 6.
-3. **Nuvem:** pode existir um modo híbrido **opcional, desligado por padrão** e com teto de gasto? Ou o projeto é **estritamente** local?
-4. **Ativação principal:** palavra ("Jarvis") como principal e palmas como extra, ou palmas obrigatórias?
-5. **Nome e repositório:** o projeto vive no repositório `JARVIS` (que hoje está vazio)? E o `Sexta-Feira`, que é um site imobiliário, fica fora disso?
-6. **Vídeo:** se o seu vídeo não for o do guia @marcondes.ai, me mande o link ou descreva as cenas.
+### 14.1 Já tomadas (11/11/2026)
+
+| Decisão | Escolha |
+|---|---|
+| Base do projeto | **OpenJarvis como base**, com as condições abaixo |
+| Ativação | **Palavra "Jarvis"** |
+| Repositório | **`JARVIS`**, separado do `Sexta-Feira` |
+| Vídeo | Só referência visual e de ideias. O projeto não segue nem depende de nenhum guia de terceiros. |
+
+**Condições para usar o OpenJarvis como base:**
+
+1. **Sem mexer no código dele e com versão travada** (commit fixo). Atualização só depois de testar.
+2. **Ferramentas de ação do OpenJarvis desligadas** (`shell_exec`, `file_write`, `apply_patch`, `code_interpreter`). Ações no computador passam só pelas nossas ferramentas, com o motor de permissões e confirmação.
+3. **Telemetria desligada explicitamente** na instalação (`--no-analytics`).
+4. **Português configurado desde o início:** `speech.language = "pt"`, Whisper `small` ou maior, voz `pf_dora`.
+5. **Desviar dos bugs abertos no Windows:** áudio próprio no lugar do dele (#1211); servidor via `jarvis serve`, que não aparece no bug #1062 (confirmar na Etapa 0); login do Google contornado ou por conector próprio (#1246).
+6. **Ponto de atenção no desenho:** no SDK, `ask_stream()` vai direto ao modelo, **sem ferramentas e sem histórico** (`src/openjarvis/sdk.py`); só `ask()` passa pelos agentes e ferramentas, e espera a resposta inteira. Conversa pode ser rápida; ações serão mais lentas. Validar na Etapa 1.
+
+### 14.2 Pendentes
+
+1. **Hardware:** resultado do diagnóstico da seção 7.2.
+2. **Nuvem:** pode existir um modo híbrido **opcional, desligado por padrão** e com teto de gasto? Ou o projeto é **estritamente** local?
 
 ---
 
@@ -582,11 +599,10 @@ Você pediu um parceiro crítico, então aqui vai sem rodeio:
   - memória: `src/openjarvis/memory/service.py`, `extractor.py`
   - interface: `frontend/src/hooks/useSpeech.ts`, `frontend/src-tauri/src/lib.rs`
   - documentação: `docs/user-guide/system-access.md`, `memory.md`, `morning-digest.md`, `mining.md`, `docs/telemetry.md`, `docs/getting-started/windows-native.md`
-- Exemplo que segue o guia do vídeo: https://github.com/enricomed/Jarvis- (`scripts/jarvis_show.py`, `scripts/nuvem.py`, `scripts/instalar_windows.bat`, `docs/SEGURANCA-LGPD.md`)
+- Projeto de terceiros sobre o OpenJarvis, usado só como exemplo de implementação: https://github.com/enricomed/Jarvis- (`scripts/jarvis_show.py`, `scripts/nuvem.py`, `scripts/instalar_windows.bat`, `docs/SEGURANCA-LGPD.md`)
 - Issues do OpenJarvis citadas: #1211, #1246, #1062, #1184, #1192, #1038, #1076, #1189, #901, #664
 
 **Pesquisa na web**
-- Guia @marcondes.ai: https://marcondes-jarvis.vercel.app/ (lido via resultados de busca; a página não abriu deste ambiente)
 - Blog do Ollama sobre o OpenJarvis (28/05/2026): https://registry.ollama.ai/blog/openjarvis
 - Projeto OpenJarvis (Stanford): https://scalingintelligence.stanford.edu/blogs/openjarvis/
 - Jarvis Clap (palmas com YAMNet, macOS): https://www.tabnews.com.br/devjoaolopes/jarvis-clap-abre-apps-com-dois-palmas
