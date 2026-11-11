@@ -5,7 +5,9 @@ set -e; cd "$(dirname "$0")"; mkdir -p out; P=../L01_o-caso-davi/producao
 DUR=$(python3 -c "import json; print(json.load(open('planos/L01_linha.json'))['total'])")
 lufs() { ffmpeg -hide_banner -i "$1" -af ebur128 -f null - 2>&1 | grep -E "^\s+I:" | tail -1 | awk '{print $2}'; }
 # 1) vídeo: capítulos em sequência
-ARGS=(); FC=""; for k in 0 1 2 3 4 5 6 7 8; do ARGS+=(-i out_v2/cap$k/video.mp4); FC+="[$k:v]fps=24,settb=1/24,format=yuv420p,setsar=1[v$k];"; done
+ARGS=(); FC=""; for k in 0 1 2 3 4 5 6 7 8; do ARGS+=(-i out_v2/cap$k/video.mp4)
+  VK=$(python3 -c "import json; L=json.load(open('planos/L01_linha.json')); V={'0': L['cap0'], **L['V']}; V['8'] = L['total'] - L['O']['8']; print(V['$k'])")
+  FC+="[$k:v]fps=24,trim=duration=$VK,setpts=PTS-STARTPTS,tpad=stop_mode=clone:stop_duration=0.2,trim=duration=$VK,settb=1/24,format=yuv420p,setsar=1[v$k];"; done
 FC+="[v0][v1][v2][v3][v4][v5][v6][v7][v8]concat=n=9:v=1:a=0[v]"
 ffmpeg -y -hide_banner -loglevel error "${ARGS[@]}" -filter_complex "$FC" -map "[v]" -c:v libx264 -crf 14 -preset medium -pix_fmt yuv420p out_v2/L01_video.mp4
 echo "vídeo: $(ffprobe -v error -show_entries format=duration -of csv=p=0 out_v2/L01_video.mp4) s (esperado $DUR)"
