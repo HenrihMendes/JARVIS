@@ -6,6 +6,7 @@ import { Header, HeaderShell } from "@/components/site/header";
 import { Footer } from "@/components/site/footer";
 import { CookieConsent } from "@/components/site/cookie-consent";
 import { Monogram } from "@/components/brand/logo";
+import { ViewCursor } from "@/components/site/view-cursor";
 import { IconWhatsapp } from "@/components/ui/icons";
 import { getSettings } from "@/lib/settings";
 import { getCategories } from "@/lib/catalog";
@@ -67,6 +68,8 @@ export default function StoreLayout({ children }: { children: React.ReactNode })
   return (
     <CartProvider>
       <Intro />
+      <div className="film-grain" aria-hidden="true" />
+      <ViewCursor />
       <Suspense fallback={null}>
         <Announcement />
       </Suspense>

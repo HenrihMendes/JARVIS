@@ -342,7 +342,8 @@ function Gallery({ images, name, productId }: { images: (MediaLike & { colorId: 
               key={m.key}
               type="button"
               onClick={() => setZoom(i)}
-              className={`group relative aspect-[3/4] w-full shrink-0 snap-center overflow-hidden bg-paper-2 lg:cursor-zoom-in ${wide(i) ? "lg:col-span-2 lg:aspect-[4/5]" : "lg:aspect-[2/3]"}`}
+              data-cursor="Ampliar"
+              className={`group relative aspect-[3/4] w-full shrink-0 snap-center overflow-hidden bg-paper-2 lg:cursor-none ${wide(i) ? "lg:col-span-2 lg:aspect-[4/5]" : "lg:aspect-[2/3]"}`}
               aria-label={`Ampliar foto ${i + 1} de ${images.length}`}
             >
               {i === 0 ? <ViewTransition name={`produto-${productId}`}>{pic}</ViewTransition> : pic}

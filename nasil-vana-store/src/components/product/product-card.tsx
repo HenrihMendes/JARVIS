@@ -30,7 +30,7 @@ export function ProductCard({
   return (
     <article className="group relative" data-reveal style={{ ["--d" as string]: (index % 4) * 90 }}>
       <Link href={`/produto/${p.slug}`} className="block focus-visible:outline-offset-4">
-        <div className={`relative ${aspect} overflow-hidden bg-paper-2`}>
+        <div className={`relative ${aspect} overflow-hidden bg-paper-2 [@media(hover:hover)_and_(pointer:fine)]:cursor-none`} data-cursor={p.status === "coming_soon" ? "Em breve" : "Ver"}>
           {morph ? <ViewTransition name={`produto-${p.id}`}>{image}</ViewTransition> : image}
           {second && (
             <Picture
@@ -49,15 +49,16 @@ export function ProductCard({
             {p.status === "coming_soon" ? "Saiba mais" : p.inStock ? "Escolher tamanho" : "Ver detalhes"}
           </span>
         </div>
-        <div className="mt-4 flex items-start justify-between gap-3">
+        {/* Celular: nome e preço empilhados (sem espremer); desktop: lado a lado */}
+        <div className="mt-3 flex flex-col gap-1 sm:mt-4 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
           <div className="min-w-0">
-            <h3 className="serif text-[1.0625rem] leading-snug sm:text-lg">{p.name}</h3>
-            {p.subtitle && <p className="mt-0.5 truncate text-[0.8125rem] text-stone">{p.subtitle}</p>}
+            <h3 className="serif text-[0.98rem] leading-snug sm:text-lg">{p.name}</h3>
+            {p.subtitle && <p className="mt-0.5 hidden truncate text-[0.8125rem] text-stone sm:block">{p.subtitle}</p>}
           </div>
           {p.priceCents != null && p.status === "active" ? (
-            <Price cents={p.priceCents} compareAt={p.compareAtCents} className="shrink-0 pt-0.5" />
+            <Price cents={p.priceCents} compareAt={p.compareAtCents} className="shrink-0 text-stone sm:pt-0.5 sm:text-ink" />
           ) : (
-            <span className="eyebrow shrink-0 pt-1.5 text-stone">Em breve</span>
+            <span className="eyebrow shrink-0 text-stone sm:pt-1.5">Em breve</span>
           )}
         </div>
       </Link>
