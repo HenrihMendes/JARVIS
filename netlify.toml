@@ -1,0 +1,3 @@
+# A loja está na subpasta nasil-vana-store; a configuração completa fica em nasil-vana-store/netlify.toml
+[build]
+  base = "nasil-vana-store"
