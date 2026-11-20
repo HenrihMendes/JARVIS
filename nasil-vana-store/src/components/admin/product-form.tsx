@@ -5,6 +5,7 @@ import { ActionForm, Check, F, Submit, type ActionState } from "./ui";
 import { saveProductAction, saveVariantsAction, uploadProductImageAction, updateProductImageAction, moveProductImageAction, deleteProductImageAction } from "@/app/admin/actions/products";
 import { centsToInput } from "@/lib/money";
 import { mediaSrc } from "@/lib/media-url";
+import { compressForUpload } from "./compress-image";
 
 type Opt = { id: string; name: string };
 
@@ -227,9 +228,10 @@ export function ImageManager({ productId, images, colors }: { productId: string;
     if (!files?.length) return;
     start(async () => {
       const msgs: string[] = [];
-      for (const f of Array.from(files)) {
-        if (f.size > 15 * 1024 * 1024) {
-          msgs.push(`${f.name}: maior que 15 MB.`);
+      for (const original of Array.from(files)) {
+        const f = await compressForUpload(original);
+        if (f.size > 5.5 * 1024 * 1024) {
+          msgs.push(`${f.name}: arquivo grande demais (máx. ~5 MB). Exporte em JPG e tente de novo.`);
           continue;
         }
         const fd = new FormData();
@@ -266,7 +268,7 @@ export function ImageManager({ productId, images, colors }: { productId: string;
           </button>
         </div>
         <input ref={input} type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/heic,image/heif" multiple hidden onChange={(e) => upload(e.target.files)} />
-        <p className="text-[0.75rem] text-stone">JPG, PNG, WebP, AVIF ou HEIC · até 15 MB · mínimo 300 px. Recomendado: 1600 × 2400 px (vertical 2:3), fundo neutro.</p>
+        <p className="text-[0.75rem] text-stone">JPG, PNG, WebP ou AVIF · reduzidas automaticamente antes do envio · mínimo 300 px. Recomendado: 1600 × 2400 px (vertical 2:3), fundo neutro.</p>
         {log.length > 0 && <ul className="text-left text-[0.8125rem] text-stone" aria-live="polite">{log.map((l, i) => <li key={i}>{l}</li>)}</ul>}
       </div>
 

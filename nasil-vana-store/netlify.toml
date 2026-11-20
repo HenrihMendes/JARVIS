@@ -1,0 +1,12 @@
+# Netlify — configure no painel: Base directory = nasil-vana-store
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+  NEXT_TELEMETRY_DISABLED = "1"
+
+[functions]
+  # sharp e argon2 têm binários nativos: não empacotar com esbuild
+  external_node_modules = ["sharp", "@node-rs/argon2"]

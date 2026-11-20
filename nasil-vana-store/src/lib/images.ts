@@ -13,7 +13,9 @@ import { putObject } from "./storage";
  */
 export const MAX_UPLOAD_BYTES = 15 * 1024 * 1024;
 const ALLOWED = new Set(["jpeg", "png", "webp", "avif", "heif"]);
-const WIDTHS = [320, 480, 640, 960, 1280, 1600, 2000];
+/** Em plataformas serverless (Netlify) use IMAGE_MAX_WIDTH=1600 para caber no tempo-limite da função. */
+const MAX_WIDTH = Math.max(640, Number(process.env.IMAGE_MAX_WIDTH) || 2000);
+const WIDTHS = [320, 480, 640, 960, 1280, 1600, 2000].filter((w) => w <= MAX_WIDTH);
 const MAX_PIXELS = 60_000_000;
 
 export class ImageValidationError extends Error {}
@@ -52,7 +54,7 @@ export async function processAndStoreImage(input: Buffer, opts: { minSize?: numb
   const height = oriented.info.height;
 
   let widths = WIDTHS.filter((w) => w <= width);
-  if (widths.length === 0 || widths[widths.length - 1] < width * 0.9) widths = [...widths, Math.min(width, 2400)];
+  if (widths.length === 0 || (widths[widths.length - 1] < width * 0.9 && widths[widths.length - 1] < MAX_WIDTH)) widths = [...widths, Math.min(width, MAX_WIDTH)];
   widths = [...new Set(widths)].sort((a, b) => a - b);
 
   const key = `media/${randomUUID()}`;
@@ -60,7 +62,7 @@ export async function processAndStoreImage(input: Buffer, opts: { minSize?: numb
   for (const w of widths) {
     const resized = sharp(oriented.data).resize({ width: w, withoutEnlargement: true });
     const [avif, webp] = await Promise.all([
-      resized.clone().avif({ quality: 52, effort: 4 }).toBuffer(),
+      resized.clone().avif({ quality: 52, effort: 2 }).toBuffer(),
       resized.clone().webp({ quality: 78, effort: 4 }).toBuffer(),
     ]);
     bytes += avif.byteLength + webp.byteLength;

@@ -27,7 +27,7 @@ function BannerForm({ b }: { b?: B }) {
       <F label="Texto do botão" name="ctaLabel" defaultValue={b?.ctaLabel ?? ""} />
       <F label="Link do botão" name="ctaHref" defaultValue={b?.ctaHref ?? ""} placeholder="/loja/vestidos" />
       <div>
-        <F label="Foto principal" name="image" type="file" accept="image/*" hint="Vertical, mínimo 1200 px de largura." />
+        <F label="Foto principal" name="image" type="file" accept="image/*" hint="Vertical, mínimo 1200 px de largura, até 5 MB (JPG)." />
         {b?.media && <img src={mediaSrc(b.media.key, b.media.widths[0])} alt="" className="mt-2 h-24 w-auto" />}
       </div>
       <div>

@@ -64,4 +64,4 @@ Checklist completo no painel (Visão geral) e em [docs/DEPLOY.md](docs/DEPLOY.md
 6. Revisão jurídica das políticas (são modelos; campos pendentes aparecem como “[informação pendente]”).
 7. Produtos em rascunho: *Conjunto Alfaiataria com Fivela* (faltam tamanhos/preço das cores azul e bege), *Conjunto Assimétrico Vinho* (falta preço e tamanho).
 
-Documentação: [Pagamentos](docs/PAGAMENTOS.md) · [Publicação](docs/DEPLOY.md) · [Manual do painel](docs/PAINEL.md) · [Google/SEO](docs/GOOGLE.md) · [Segurança e LGPD](docs/SEGURANCA.md) · [Fotografia](docs/FOTOGRAFIA.md) · [Frete](docs/FRETE.md)
+Documentação: [Pagamentos](docs/PAGAMENTOS.md) · [Publicação na Netlify](docs/NETLIFY.md) · [Publicação em VPS](docs/DEPLOY.md) · [Manual do painel](docs/PAINEL.md) · [Google/SEO](docs/GOOGLE.md) · [Segurança e LGPD](docs/SEGURANCA.md) · [Fotografia](docs/FOTOGRAFIA.md) · [Frete](docs/FRETE.md)

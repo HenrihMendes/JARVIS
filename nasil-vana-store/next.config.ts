@@ -45,12 +45,13 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
-  output: "standalone",
+  // Docker/VPS usa o servidor "standalone"; na Netlify o adaptador oficial cuida do empacotamento.
+  output: process.env.NETLIFY ? undefined : "standalone",
   poweredByHeader: false,
   reactStrictMode: true,
   serverExternalPackages: ["@node-rs/argon2", "sharp"],
   experimental: {
-    serverActions: { bodySizeLimit: "16mb" },
+    serverActions: { bodySizeLimit: process.env.NETLIFY ? "6mb" : "16mb" },
   },
   turbopack: {
     rules: {
