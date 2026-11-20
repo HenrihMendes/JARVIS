@@ -10,6 +10,7 @@ import { Picture } from "@/components/ui/picture";
 import { ProductCard } from "@/components/product/product-card";
 import { CategoryIndex } from "@/components/home/category-index";
 import { HeroSlides } from "@/components/home/hero-slides";
+import { Lookbook } from "@/components/home/lookbook";
 import { Rail } from "@/components/home/rail";
 import { Monogram } from "@/components/brand/logo";
 import { IconArrow, IconLock, IconReturn, IconChat, IconPin, IconInstagram } from "@/components/ui/icons";
@@ -80,7 +81,7 @@ function SectionHead({ index, eyebrow, title, href, cta }: { index: string; eyeb
 }
 
 async function Home() {
-  const [{ featured, fresh, comingSoon, categoryCards, banners }, settings, shipping] = await Promise.all([
+  const [{ featured, fresh, comingSoon, categoryCards, banners, looks }, settings, shipping] = await Promise.all([
     getHomeData(),
     getSettings(),
     db.select({ type: schema.shippingMethods.type }).from(schema.shippingMethods).where(eq(schema.shippingMethods.active, true)),
@@ -131,7 +132,7 @@ async function Home() {
               )}
               <div className="fade-up mt-5 flex flex-wrap items-center gap-x-6 gap-y-3 lg:mt-9 lg:gap-3" style={{ ["--d" as string]: 900 }}>
                 {hero.ctaHref && (
-                  <Link href={hero.ctaHref} className="btn btn-light lg:btn-primary lg:border-ink lg:bg-ink lg:text-paper">
+                  <Link href={hero.ctaHref} data-magnetic className="btn btn-light lg:btn-primary lg:border-ink lg:bg-ink lg:text-paper">
                     {hero.ctaLabel || "Explorar"} <IconArrow size={16} className="btn-arrow" />
                   </Link>
                 )}
@@ -227,6 +228,22 @@ async function Home() {
             </div>
           </div>
         </section>
+      )}
+
+      {/* ============================ LOOKBOOK ============================ */}
+      {looks.length >= 3 && (
+        <div className="mt-28 sm:mt-36">
+          <Lookbook
+            looks={looks.map((l) => ({
+              slug: l.product.slug,
+              name: l.product.name,
+              subtitle: l.product.subtitle,
+              priceCents: l.product.priceCents,
+              category: l.product.categoryName,
+              image: l.image,
+            }))}
+          />
+        </div>
       )}
 
       {/* =========================== CATEGORIAS =========================== */}

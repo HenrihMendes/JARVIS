@@ -53,6 +53,7 @@ export function Sheet({
       onClick={(e) => {
         if (e.target === ref.current) onClose();
       }}
+      data-lenis-prevent
       className={`sheet sheet-${side} ${className}`}
     >
       {children}

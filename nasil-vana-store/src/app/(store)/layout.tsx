@@ -7,17 +7,20 @@ import { Footer } from "@/components/site/footer";
 import { CookieConsent } from "@/components/site/cookie-consent";
 import { Monogram } from "@/components/brand/logo";
 import { ViewCursor } from "@/components/site/view-cursor";
+import { SmoothScroll } from "@/components/site/smooth-scroll";
+import { PageCurtain } from "@/components/site/page-curtain";
+import { Magnetic } from "@/components/site/magnetic";
 import { IconWhatsapp } from "@/components/ui/icons";
 import { getSettings } from "@/lib/settings";
-import { getCategories } from "@/lib/catalog";
+import { getHomeData } from "@/lib/catalog";
 import { whatsappLink } from "@/lib/br";
 
 async function HeaderWithData() {
-  const [settings, categories] = await Promise.all([getSettings(), getCategories()]);
+  const [settings, home] = await Promise.all([getSettings(), getHomeData()]);
   const s = settings.store;
   return (
     <Header
-      categories={categories.map((c) => ({ slug: c.slug, name: c.name }))}
+      categories={home.categoryCards.map((c) => ({ slug: c.slug, name: c.name, cover: c.cover, count: c.count }))}
       whatsappHref={whatsappLink(s.whatsapp, "Olá! Vim pelo site da Nasil Vana Store.")}
       instagramHref={s.instagram ? `https://instagram.com/${s.instagram.replace(/^@/, "")}` : null}
     />
@@ -70,6 +73,11 @@ export default function StoreLayout({ children }: { children: React.ReactNode })
       <Intro />
       <div className="film-grain" aria-hidden="true" />
       <ViewCursor />
+      <Magnetic />
+      <Suspense fallback={null}>
+        <SmoothScroll />
+        <PageCurtain />
+      </Suspense>
       <Suspense fallback={null}>
         <Announcement />
       </Suspense>

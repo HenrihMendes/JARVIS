@@ -8,7 +8,10 @@ import { IconBag, IconClose, IconMenu, IconSearch, IconArrow, IconInstagram, Ico
 import { Sheet } from "@/components/ui/sheet";
 import { useCart } from "@/components/cart/cart-context";
 
-export type NavCategory = { slug: string; name: string };
+import { Picture } from "@/components/ui/picture";
+import type { MediaLike } from "@/lib/media-url";
+
+export type NavCategory = { slug: string; name: string; cover?: MediaLike | null; count?: number };
 
 export function Header({
   categories,
@@ -107,6 +110,7 @@ export function Header({
             </button>
             <button
               type="button"
+              id="bag-button"
               onClick={openCart}
               className="relative -mr-2.5 grid h-11 w-11 place-items-center"
               aria-label={`Abrir sacola${count ? `, ${count} ${count === 1 ? "item" : "itens"}` : ""}`}
@@ -125,46 +129,48 @@ export function Header({
         </div>
       </header>
 
-      {/* Menu mobile */}
-      <Sheet open={menu} onClose={() => setMenu(false)} side="left" label="Menu">
+      {/* Menu em tela cheia (celular) */}
+      <Sheet open={menu} onClose={() => setMenu(false)} side="full" label="Menu" className="!bg-ink !text-paper">
         <div className="flex h-full flex-col">
           <div className="flex items-center justify-between px-6 py-4">
-            <Monogram className="h-7 w-auto" />
+            <Monogram className="h-7 w-auto text-paper" />
             <button type="button" onClick={() => setMenu(false)} className="-mr-2 grid h-11 w-11 place-items-center" aria-label="Fechar menu">
               <IconClose />
             </button>
           </div>
-          <nav aria-label="Menu" className="flex-1 overflow-y-auto px-6 pt-6">
-            <ul className="space-y-1">
-              {[{ slug: "", name: "Toda a loja" }, ...categories].map((c, i) => (
+          <nav aria-label="Menu" className="flex-1 overflow-y-auto px-6 pt-4">
+            <ul className="divide-y divide-paper/10 border-y border-paper/10">
+              {[{ slug: "", name: "Toda a loja", cover: null, count: undefined } as NavCategory, ...categories].map((c, i) => (
                 <li key={c.slug || "all"} className="overflow-hidden">
                   <Link
                     href={c.slug ? `/loja/${c.slug}` : "/loja"}
-                    className="display flex items-baseline gap-4 py-1.5 text-[2.6rem] leading-none"
-                    style={{ animation: menu ? `rise .9s var(--ease-editorial) ${120 + i * 60}ms both` : undefined }}
+                    className="group flex items-center gap-4 py-4"
+                    style={{ animation: menu ? `rise .9s var(--ease-editorial) ${120 + i * 70}ms both` : undefined }}
                   >
-                    <span className="eyebrow w-6 text-stone">{String(i + 1).padStart(2, "0")}</span>
-                    {c.name}
+                    <span className="relative h-16 w-12 shrink-0 overflow-hidden bg-paper/10">
+                      {c.cover ? <Picture media={c.cover} sizes="60px" fill alt="" /> : <Monogram className="absolute inset-3 h-auto w-auto text-paper/40" />}
+                    </span>
+                    <span className="display flex-1 text-[2.1rem] leading-none">{c.name}</span>
+                    <span className="eyebrow text-paper/50">{c.count != null ? String(c.count).padStart(2, "0") : ""}</span>
                   </Link>
                 </li>
               ))}
             </ul>
-            <div className="hairline my-8" />
-            <ul className="space-y-3 text-sm uppercase tracking-[0.16em]">
+            <ul className="mt-8 grid grid-cols-2 gap-3 text-[0.8125rem] uppercase tracking-[0.14em] text-paper/70">
               <li><Link href="/nossa-historia">Nossa história</Link></li>
-              <li><Link href="/perguntas-frequentes">Perguntas frequentes</Link></li>
-              <li><Link href="/trocas-e-devolucoes">Trocas e devoluções</Link></li>
+              <li><Link href="/perguntas-frequentes">Dúvidas</Link></li>
+              <li><Link href="/trocas-e-devolucoes">Trocas</Link></li>
               <li><Link href="/contato">Contato</Link></li>
             </ul>
           </nav>
-          <div className="flex gap-3 border-t border-line px-6 py-5">
+          <div className="flex gap-3 border-t border-paper/10 px-6 py-5">
             {whatsappHref && (
-              <a href={whatsappHref} target="_blank" rel="noopener" className="btn btn-outline flex-1 !min-h-11 !px-3">
+              <a href={whatsappHref} target="_blank" rel="noopener" className="btn btn-light flex-1 !min-h-11 !px-3">
                 <IconWhatsapp size={18} /> WhatsApp
               </a>
             )}
             {instagramHref && (
-              <a href={instagramHref} target="_blank" rel="noopener" className="btn btn-outline flex-1 !min-h-11 !px-3">
+              <a href={instagramHref} target="_blank" rel="noopener" className="btn flex-1 !min-h-11 border-paper/40 !px-3 text-paper">
                 <IconInstagram size={18} /> Instagram
               </a>
             )}

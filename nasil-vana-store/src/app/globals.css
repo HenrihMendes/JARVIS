@@ -388,3 +388,21 @@ html.intro-seen { --intro-delay: 0ms; }
   .sheet-bottom[open] { transform: translateY(100%); }
   .sheet-full[open] { opacity: 0; }
 }
+
+/* ------------------------------ Cortina de navegação ------------------------------ */
+.page-curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  display: grid;
+  place-items: center;
+  background: var(--color-ink);
+  pointer-events: none;
+}
+.page-curtain.is-in { animation: curtain-in 0.42s var(--ease-curtain) both; }
+.page-curtain.is-out { animation: curtain-out 0.8s var(--ease-curtain) both; }
+.page-curtain svg { animation: fade 0.3s ease 0.15s both; }
+@keyframes curtain-in { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes curtain-out { from { clip-path: inset(0 0 0 0); } to { clip-path: inset(0 0 100% 0); } }
+
+[data-magnetic] { transition: transform 0.5s var(--ease-editorial); will-change: transform; }

@@ -238,6 +238,18 @@ export async function getHomeData() {
   if (bestIdx > 0) featured.unshift(...featured.splice(bestIdx, 1));
   const fresh = available.filter((c) => c.isNew).slice(0, 8);
   const comingSoon = cards.filter((c) => c.status === "coming_soon").slice(0, 2);
+  // Lookbook: looks de corpo inteiro (fotos verticais), um por categoria, priorizando resolução
+  const tallest = (c: ProductCardData) => [...c.images].sort((x, y) => y.height - x.height)[0];
+  const looks: { product: ProductCardData; image: MediaLike }[] = [];
+  const usedCats = new Set<string | null>();
+  for (const c of [...available].sort((a, b) => (tallest(b)?.height ?? 0) - (tallest(a)?.height ?? 0))) {
+    const img = tallest(c);
+    if (!img || img.height / img.width < 1.6) continue;
+    if (usedCats.has(c.categorySlug) && looks.length < 3) continue;
+    usedCats.add(c.categorySlug);
+    looks.push({ product: c, image: img });
+    if (looks.length === 4) break;
+  }
   const categoryCards = categories
     .map((cat) => {
       const products = available.filter((p) => p.categorySlug === cat.slug);
@@ -247,7 +259,7 @@ export async function getHomeData() {
       return { slug: cat.slug, name: cat.name, description: cat.description, count: products.length, cover };
     })
     .filter((c) => c.count > 0);
-  return { featured, fresh, comingSoon, categoryCards, banners };
+  return { featured, fresh, comingSoon, categoryCards, banners, looks };
 }
 
 export const getActiveBanners = cache(async () => {

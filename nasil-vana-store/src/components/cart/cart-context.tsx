@@ -88,7 +88,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       pending,
       add: async (variantId, qty = 1) => {
         const r = await run(() => addToCartAction(variantId, qty));
-        if (r.ok) setOpen(true);
+        if (r.ok) window.setTimeout(() => setOpen(true), 650); // deixa a foto "voar" até a sacola
         return r;
       },
       update: async (variantId, qty) => void (await run(() => updateQuantityAction(variantId, qty))),

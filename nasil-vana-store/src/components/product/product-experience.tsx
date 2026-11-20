@@ -8,6 +8,7 @@ import { Price, Installments } from "@/components/ui/price";
 import { Sheet } from "@/components/ui/sheet";
 import { IconClose, IconZoom, IconWhatsapp, IconRuler, IconCheck, IconArrow } from "@/components/ui/icons";
 import { useCart } from "@/components/cart/cart-context";
+import { flyToBag } from "@/components/cart/fly-to-bag";
 import type { ProductDetail } from "@/lib/catalog";
 import type { MediaLike } from "@/lib/media-url";
 import { mediaSrc, largest } from "@/lib/media-url";
@@ -86,6 +87,7 @@ export function ProductExperience({ product: p, maxInstallments, installmentNote
       return;
     }
     if (!selected || selected.stock <= 0) return;
+    flyToBag(document.querySelector<HTMLElement>("[data-gallery] > button"));
     const r = await add(selected.id, 1);
     if (r.ok) {
       setAdded(true);
@@ -216,7 +218,7 @@ export function ProductExperience({ product: p, maxInstallments, installmentNote
                     {stockLabel}
                   </p>
                 )}
-                <button ref={ctaRef} type="button" onClick={onAdd} disabled={pending || (selected != null && selected.stock <= 0)} className="btn btn-primary w-full" aria-live="polite">
+                <button ref={ctaRef} type="button" data-magnetic onClick={onAdd} disabled={pending || (selected != null && selected.stock <= 0)} className="btn btn-primary w-full" aria-live="polite">
                   {added && <IconCheck size={18} />}
                   {buyButtonLabel}
                 </button>
@@ -326,6 +328,7 @@ function Gallery({ images, name, productId }: { images: (MediaLike & { colorId: 
         onScroll={onScroll}
         className="flex snap-x snap-mandatory overflow-x-auto scrollbar-none lg:grid lg:grid-cols-2 lg:gap-3 lg:overflow-visible"
         aria-label={`Fotos de ${name}`}
+        data-gallery
       >
         {images.map((m, i) => {
           const pic = (
