@@ -31,16 +31,13 @@ export const CROPS: Crop[] = [
   c("fivela-azul", "conjunto-fivela-azul.jpg", 0, 0, 945, 1280),
   c("fivela-bege", "conjunto-fivela-bege.jpg", 0, 24, 763, 1033),
   c("fivela-preto", "poster-conjunto-fivela-preto.jpg", 318, 214, 676, 1010),
-  c("fivela-preto-detalhe", "poster-conjunto-fivela-preto.jpg", 52, 690, 282, 900),
 
   // Vestido chemise com cinto
   c("vestido-preto", "poster-vestido-preto.jpg", 0, 0, 392, 1036),
-  c("vestido-preto-costas", "poster-vestido-preto.jpg", 588, 796, 826, 1166),
   c("vestido-offwhite", "poster-vestido-offwhite.jpg", 0, 0, 388, 1030),
-  c("vestido-offwhite-costas", "poster-vestido-offwhite.jpg", 584, 794, 820, 1160),
 
   // Conjunto colete + calça (berinjela)
-  c("colete-berinjela", "poster-colete-berinjela.jpg", 0, 0, 512, 1280),
+  c("colete-berinjela", "poster-colete-berinjela.jpg", 0, 0, 490, 1280),
 
   // Conjunto assimétrico vinho (sem preço informado)
   c("conjunto-vinho", "poster-conjunto-vinho.jpg", 218, 0, 708, 1152),
@@ -66,8 +63,8 @@ export const CROPS: Crop[] = [
   c("corset-renda-azul-produto", "poster-corset-renda-preto-azul.jpg", 395, 890, 668, 1205),
 
   // Corset renda com alças — rosa / amarelo
-  c("corset-alcas-rosa", "poster-corset-rosa-amarelo.jpg", 0, 360, 436, 1280),
-  c("corset-alcas-amarelo", "poster-corset-rosa-amarelo.jpg", 612, 360, 1024, 1280),
+  c("corset-alcas-rosa", "poster-corset-rosa-amarelo.jpg", 0, 380, 404, 1280),
+  c("corset-alcas-amarelo", "poster-corset-rosa-amarelo.jpg", 630, 380, 1024, 1280),
 
   // Corset floral barbatanas aparentes — rosé / creme
   c("corset-barbatana-rose-modelo", "poster-corset-barbatanas.jpg", 0, 250, 316, 800),

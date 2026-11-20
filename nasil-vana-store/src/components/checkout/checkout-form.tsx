@@ -56,6 +56,8 @@ export function CheckoutForm({ requireCpf, paymentsReady, whatsappHref, acceptBo
   const [couponMsg, setCouponMsg] = useState<string | null>(null);
   const numberRef = useRef<HTMLInputElement>(null);
 
+  // Gerada só no navegador (evita divergência de hidratação); protege contra pedido duplicado
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setIdem(crypto.randomUUID()), []);
 
   const fetchQuote = (c: string | null) =>

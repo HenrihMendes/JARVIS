@@ -40,10 +40,13 @@ export function Header({
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => {
+  // Fecha menu/busca ao navegar
+  const [prevPath, setPrevPath] = useState(pathname);
+  if (prevPath !== pathname) {
+    setPrevPath(pathname);
     setMenu(false);
     setSearch(false);
-  }, [pathname]);
+  }
 
   const primary = categories.slice(0, 4);
   const count = cart?.count ?? 0;

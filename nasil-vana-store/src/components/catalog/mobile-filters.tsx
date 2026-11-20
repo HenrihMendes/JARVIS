@@ -1,14 +1,18 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
 import { Sheet } from "@/components/ui/sheet";
 import { IconClose, IconFilter } from "@/components/ui/icons";
 
 export function MobileFilters({ count, children }: { count: number; children: ReactNode }) {
   const [open, setOpen] = useState(false);
-  const sp = useSearchParams();
-  useEffect(() => setOpen(false), [sp]);
+  const sp = useSearchParams().toString();
+  const [prev, setPrev] = useState(sp);
+  if (prev !== sp) {
+    setPrev(sp);
+    setOpen(false);
+  }
   return (
     <>
       <button type="button" onClick={() => setOpen(true)} className="flex min-h-10 items-center gap-2 border border-line px-3.5 text-[0.75rem] uppercase tracking-[0.14em] lg:hidden" aria-haspopup="dialog">

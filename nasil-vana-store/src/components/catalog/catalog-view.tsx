@@ -229,7 +229,8 @@ export async function CatalogView({ base, filters, emptyHint }: { base: string; 
           <div className="sticky top-[calc(var(--header-h)+5rem)]">{filterPanel}</div>
         </aside>
 
-        <section aria-label="Produtos">
+        <section aria-labelledby="lista-produtos">
+          <h2 id="lista-produtos" className="sr-only">Produtos</h2>
           {items.length === 0 ? (
             <div className="flex min-h-[50vh] flex-col items-start justify-center gap-6 border border-dashed border-line p-10 sm:p-16">
               <p className="display text-[clamp(2.2rem,5vw,3.8rem)]">

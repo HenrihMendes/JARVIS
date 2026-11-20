@@ -4,14 +4,14 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { RevealObserver } from "@/components/site/reveal-observer";
 
-const bodoni = localFont({
+const serif = localFont({
   src: [
-    { path: "../fonts/bodoni-moda-latin-opsz-normal.woff2", style: "normal", weight: "400 900" },
-    { path: "../fonts/bodoni-moda-latin-opsz-italic.woff2", style: "italic", weight: "400 900" },
+    { path: "../fonts/dm-serif-display-latin-400-normal.woff2", style: "normal", weight: "400" },
+    { path: "../fonts/dm-serif-display-latin-400-italic.woff2", style: "italic", weight: "400" },
   ],
-  variable: "--font-bodoni",
+  variable: "--font-serif-display",
   display: "swap",
-  fallback: ["Didot", "Georgia", "serif"],
+  fallback: ["Georgia", "serif"],
   adjustFontFallback: "Times New Roman",
 });
 
@@ -40,6 +40,7 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image" },
   formatDetection: { telephone: false, email: false, address: false },
   manifest: "/manifest.webmanifest",
+  verification: process.env.GOOGLE_SITE_VERIFICATION ? { google: process.env.GOOGLE_SITE_VERIFICATION } : undefined,
 };
 
 export const viewport: Viewport = {
@@ -54,7 +55,7 @@ const introScript = `try{var d=document.documentElement;d.classList.remove('no-j
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="pt-BR" className={`no-js ${bodoni.variable} ${jost.variable}`} suppressHydrationWarning>
+    <html lang="pt-BR" className={`no-js ${serif.variable} ${jost.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: introScript }} />
       </head>

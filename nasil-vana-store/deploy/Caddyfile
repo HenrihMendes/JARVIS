@@ -1,0 +1,9 @@
+# Troque pelo seu domínio. O Caddy emite e renova o certificado HTTPS sozinho.
+seudominio.com.br {
+	redir https://www.seudominio.com.br{uri} permanent
+}
+www.seudominio.com.br {
+	encode zstd gzip
+	request_body { max_size 20MB }
+	reverse_proxy app:3000
+}

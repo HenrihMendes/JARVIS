@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useId } from "react";
+import Link from "next/link";
 import { subscribeNewsletter } from "@/app/actions/newsletter";
 
 type NewsletterState = { ok: boolean; message: string } | null;
@@ -47,9 +48,9 @@ export function NewsletterForm({ tone = "light", source = "rodape" }: { tone?: "
         <input type="checkbox" name="consent" required className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--color-suede)]" />
         <span>
           Aceito receber novidades e ofertas por e-mail. Posso cancelar quando quiser. Veja a{" "}
-          <a href="/politica-de-privacidade" className="underline underline-offset-2">
+          <Link href="/politica-de-privacidade" className="underline underline-offset-2">
             política de privacidade
-          </a>
+          </Link>
           .
         </span>
       </label>

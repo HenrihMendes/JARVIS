@@ -29,7 +29,7 @@ export function ProductCard({
   );
   return (
     <article className="group relative" data-reveal style={{ ["--d" as string]: (index % 4) * 90 }}>
-      <Link href={`/produto/${p.slug}`} className="block focus-visible:outline-offset-4" aria-label={`${p.name}${p.priceCents ? `, ${(p.priceCents / 100).toFixed(2).replace(".", ",")} reais` : ""}${badge ? `, ${badge}` : ""}`}>
+      <Link href={`/produto/${p.slug}`} className="block focus-visible:outline-offset-4">
         <div className={`relative ${aspect} overflow-hidden bg-paper-2`}>
           {morph ? <ViewTransition name={`produto-${p.id}`}>{image}</ViewTransition> : image}
           {second && (

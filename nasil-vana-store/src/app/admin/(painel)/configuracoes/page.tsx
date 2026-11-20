@@ -79,7 +79,8 @@ async function Forms() {
           <input type="hidden" name="_key" value="seo" />
           <F label="Título padrão" name="defaultTitle" maxLength={70} defaultValue={s.seo.defaultTitle} />
           <F label="Descrição padrão" name="defaultDescription" as="textarea" rows={2} maxLength={170} defaultValue={s.seo.defaultDescription} />
-          <F label="Google Search Console — código de verificação (meta tag)" name="googleSiteVerification" defaultValue={s.seo.googleSiteVerification} hint="Apenas o valor do content=, ex.: abc123..." />
+          <input type="hidden" name="googleSiteVerification" value={s.seo.googleSiteVerification} />
+          <p className="text-[0.8125rem] text-stone">Google Search Console: verifique o domínio por DNS (recomendado) ou defina a variável <code>GOOGLE_SITE_VERIFICATION</code> no servidor. Veja docs/GOOGLE.md.</p>
           <F label="Google Analytics 4 — ID de medição" name="ga4MeasurementId" defaultValue={s.seo.ga4MeasurementId} placeholder="G-XXXXXXXXXX" hint="Só carrega após consentimento da visitante (LGPD)." />
           <Check label="Gerar feed de produtos para o Google Merchant Center" name="merchantFeedEnabled" defaultChecked={s.seo.merchantFeedEnabled} hint={`${site}/feeds/google-merchant.xml`} />
           {owner && <Submit>Salvar SEO</Submit>}

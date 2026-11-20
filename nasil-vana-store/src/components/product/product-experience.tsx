@@ -300,8 +300,12 @@ function Gallery({ images, name, productId }: { images: (MediaLike & { colorId: 
   const [zoom, setZoom] = useState<number | null>(null);
   const track = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  const [prevImages, setPrevImages] = useState(images);
+  if (prevImages !== images) {
+    setPrevImages(images);
     setIndex(0);
+  }
+  useEffect(() => {
     track.current?.scrollTo({ left: 0 });
   }, [images]);
 
@@ -366,12 +370,14 @@ function Lightbox({ images, start, onClose, name }: { images: MediaLike[]; start
   const [i, setI] = useState(0);
   const [zoomed, setZoomed] = useState(false);
   const [origin, setOrigin] = useState("50% 50%");
-  useEffect(() => {
+  const [prevStart, setPrevStart] = useState(start);
+  if (prevStart !== start) {
+    setPrevStart(start);
     if (start != null) {
       setI(start);
       setZoomed(false);
     }
-  }, [start]);
+  }
   useEffect(() => {
     if (start == null) return;
     const onKey = (e: KeyboardEvent) => {

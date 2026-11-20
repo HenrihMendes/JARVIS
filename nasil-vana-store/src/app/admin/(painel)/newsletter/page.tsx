@@ -15,7 +15,8 @@ async function List() {
   ]);
   return (
     <>
-      <p className="mb-4 text-sm">{n} inscrita(s) ativas. <a href="/admin/newsletter/exportar" className="underline">Exportar CSV</a> (para importar na sua ferramenta de e-mail).</p>
+      <p className="mb-4 text-sm">{n} inscrita(s) ativas. {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- download de arquivo (rota de API) */}
+      <a href="/admin/newsletter/exportar" className="underline">Exportar CSV</a> (para importar na sua ferramenta de e-mail).</p>
       <Table head={["E-mail", "Origem", "Consentimento"]} empty={rows.length ? undefined : "Nenhuma inscrição ainda."}>
         {rows.map((r) => (
           <tr key={r.id}><td className="px-4 py-3">{r.email}</td><td className="px-4 py-3 text-stone">{r.source}</td><td className="px-4 py-3 text-stone">{r.consentAt.toLocaleString("pt-BR", { timeZone: "America/Cuiaba" })}</td></tr>

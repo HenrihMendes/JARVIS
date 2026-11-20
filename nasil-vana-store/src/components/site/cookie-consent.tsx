@@ -1,6 +1,7 @@
 "use client";
 
 import Script from "next/script";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 /**
@@ -28,7 +29,10 @@ export function CookieConsent({ gaId }: { gaId: string | null }) {
   const [ready, setReady] = useState(false);
   useEffect(() => {
     const sync = () => setChoice(readChoice());
+    // Cookie só existe no navegador: leitura após montar
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     sync();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setReady(true);
     const reopen = () => setChoice(null);
     window.addEventListener("nv-consent", sync);
@@ -55,7 +59,7 @@ export function CookieConsent({ gaId }: { gaId: string | null }) {
         <div role="dialog" aria-label="Preferências de cookies" className="fixed inset-x-3 bottom-3 z-[70] mx-auto max-w-xl bg-paper p-5 shadow-[0_20px_60px_-20px_rgba(0,0,0,.4)] ring-1 ring-line sm:inset-x-6 sm:bottom-6">
           <p className="text-sm text-ink-2">
             Usamos cookies essenciais para o funcionamento da loja. Com a sua permissão, usamos também cookies de medição (Google Analytics) para melhorar o site.{" "}
-            <a href="/politica-de-cookies" className="underline underline-offset-2">Saiba mais</a>.
+            <Link href="/politica-de-cookies" className="underline underline-offset-2">Saiba mais</Link>.
           </p>
           <div className="mt-4 flex gap-3">
             <button type="button" className="btn btn-outline !min-h-11 flex-1" onClick={() => saveChoice("denied")}>

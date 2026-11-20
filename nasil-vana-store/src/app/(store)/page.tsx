@@ -16,15 +16,13 @@ import { IconArrow, IconLock, IconReturn, IconChat, IconPin, IconInstagram } fro
 import { JsonLd } from "@/components/seo/json-ld";
 import { organizationJsonLd, websiteJsonLd } from "@/lib/seo";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { seo } = await getSettings();
-  return {
-    title: { absolute: seo.defaultTitle },
-    description: seo.defaultDescription,
-    alternates: { canonical: "/" },
-    verification: seo.googleSiteVerification ? { google: seo.googleSiteVerification } : undefined,
-  };
-}
+// Metadados estáticos: entram já no HTML inicial (Google, WhatsApp e Instagram leem sem esperar o streaming).
+export const metadata: Metadata = {
+  title: { absolute: "Nasil Vana Store — Moda feminina em Sinop, MT" },
+  description:
+    "Moda feminina com elegância e personalidade: corsets, vestidos, conjuntos e alfaiataria. Loja em Sinop, MT, com compra online e pagamento seguro.",
+  alternates: { canonical: "/" },
+};
 
 export default function HomePage() {
   return (
@@ -106,7 +104,7 @@ async function Home() {
             {/* Imagens */}
             <div className="relative h-[86svh] min-h-[540px] lg:order-2 lg:col-span-7 lg:h-auto lg:min-h-0 lg:py-6">
               {hero.media && (
-                <div className="unveil absolute inset-0 overflow-hidden lg:inset-y-6 lg:left-[16%] lg:right-0" style={{ ["--d" as string]: 0 }}>
+                <div className="hero-settle absolute inset-0 overflow-hidden lg:inset-y-6 lg:left-[16%] lg:right-0">
                   <Picture media={hero.media} sizes="(min-width: 1024px) 50vw, 100vw" fill priority alt={hero.media.alt ?? ""} />
                 </div>
               )}

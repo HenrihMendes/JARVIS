@@ -57,6 +57,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [toast]);
 
   useEffect(() => {
+    // Busca inicial do carrinho após a hidratação (mantém as páginas pré-renderizáveis)
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void refresh();
     // Revalida quando a aba volta ao foco (estoque/preço podem ter mudado)
     const onVis = () => document.visibilityState === "visible" && void refresh();

@@ -10,6 +10,7 @@ import { createDb } from "../src/db/client";
 import * as s from "../src/db/schema";
 import { processAndStoreImage } from "../src/lib/images";
 import { CROPS } from "./crops";
+import { editorialGrade } from "./grade";
 import { SEED_CATEGORIES, SEED_COLORS, SEED_PRODUCTS, SEED_SIZES } from "./catalog";
 import { FAQ_TEMPLATES, PAGE_TEMPLATES, SIZE_GUIDE_PAGE } from "./pages";
 
@@ -39,7 +40,7 @@ async function main() {
         .extract({ left: c.left, top: c.top, width: c.width, height: c.height })
         .png()
         .toBuffer();
-      const img = await processAndStoreImage(buf, { minSize: 150 });
+      const img = await processAndStoreImage(await editorialGrade(buf), { minSize: 150 });
       const meta = altByCrop.get(c.out);
       const [row] = await db
         .insert(s.media)
