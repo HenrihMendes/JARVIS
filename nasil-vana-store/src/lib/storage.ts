@@ -1,6 +1,7 @@
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { AwsClient } from "aws4fetch";
+import { getStore } from "@netlify/blobs";
 import { env } from "./env";
 
 /**
@@ -37,8 +38,15 @@ function s3Client() {
 }
 const s3Url = (key: string) => `${env.S3_ENDPOINT!.replace(/\/$/, "")}/${env.S3_BUCKET}/${key}`;
 
+const blobs = () => getStore({ name: "media", consistency: "strong" });
+
 export async function putObject(key: string, body: Buffer, contentType: string) {
   assertKey(key);
+  if (env.STORAGE_DRIVER === "netlify-blobs") {
+    const ab = body.buffer.slice(body.byteOffset, body.byteOffset + body.byteLength) as ArrayBuffer;
+    await blobs().set(key, ab, { metadata: { contentType } });
+    return;
+  }
   if (env.STORAGE_DRIVER === "local") {
     const p = localPath(key);
     await mkdir(path.dirname(p), { recursive: true });
@@ -57,6 +65,11 @@ export async function putObject(key: string, body: Buffer, contentType: string) 
 }
 
 export async function getLocalObject(key: string): Promise<Buffer | null> {
+  if (env.STORAGE_DRIVER === "netlify-blobs") {
+    assertKey(key);
+    const ab = await blobs().get(key, { type: "arrayBuffer" });
+    return ab ? Buffer.from(ab) : null;
+  }
   try {
     return await readFile(localPath(key));
   } catch {
@@ -68,7 +81,8 @@ export async function deletePrefix(prefix: string, files: string[]) {
   for (const f of files) {
     const key = `${prefix}/${f}`;
     assertKey(key);
-    if (env.STORAGE_DRIVER === "local") await rm(localPath(key), { force: true });
+    if (env.STORAGE_DRIVER === "netlify-blobs") await blobs().delete(key);
+    else if (env.STORAGE_DRIVER === "local") await rm(localPath(key), { force: true });
     else await s3Client().fetch(s3Url(key), { method: "DELETE" });
   }
 }

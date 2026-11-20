@@ -16,6 +16,8 @@ export async function GET(_req: Request, ctx: RouteContext<"/media/[...key]">) {
     headers: {
       "content-type": TYPES[ext],
       "cache-control": "public, max-age=31536000, immutable",
+      // Netlify: guarda na CDN para não executar a função a cada visualização
+      "netlify-cdn-cache-control": "public, durable, max-age=31536000, immutable",
       "x-content-type-options": "nosniff",
     },
   });

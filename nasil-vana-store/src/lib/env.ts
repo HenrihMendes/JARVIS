@@ -1,4 +1,9 @@
+import { createHash } from "node:crypto";
 import { z } from "zod";
+
+/** Rodando na Netlify? (NETLIFY no build; IS_NETLIFY é embutido pelo next.config nas funções) */
+export const onNetlify = process.env.NETLIFY === "true" || process.env.IS_NETLIFY === "1";
+
 
 /**
  * Variáveis de ambiente validadas na inicialização.
@@ -12,12 +17,12 @@ const bool = z
 const schema = z.object({
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
   DATABASE_URL: z.string().min(1, "DATABASE_URL é obrigatória"),
-  DATABASE_POOL_MAX: z.coerce.number().int().min(1).max(50).default(10),
+  DATABASE_POOL_MAX: z.coerce.number().int().min(1).max(50).default(onNetlify ? 3 : 10),
   DATABASE_SSL: bool,
   DATABASE_PREPARE: z
     .enum(["true", "false"])
     .optional()
-    .transform((v) => v !== "false"),
+    .transform((v) => (v ? v !== "false" : !onNetlify)),
 
   /** URL pública do site, sem barra final. Ex.: https://www.nasilvanastore.com.br */
   SITE_URL: z.string().url().default("http://localhost:3000"),
@@ -33,7 +38,7 @@ const schema = z.object({
   MP_WEBHOOK_TOLERANCE_SECONDS: z.coerce.number().int().min(0).default(0),
 
   /* Armazenamento de imagens */
-  STORAGE_DRIVER: z.enum(["local", "s3"]).default("local"),
+  STORAGE_DRIVER: z.enum(["local", "s3", "netlify-blobs"]).default(onNetlify ? "netlify-blobs" : "local"),
   STORAGE_LOCAL_DIR: z.string().default("./storage"),
   S3_ENDPOINT: z.string().url().optional(),
   S3_REGION: z.string().default("auto"),
@@ -55,7 +60,16 @@ const schema = z.object({
 });
 
 function load() {
-  const parsed = schema.safeParse(process.env);
+  const raw: Record<string, string | undefined> = { ...process.env };
+  // Netlify DB / Neon pela integração da Netlify
+  raw.DATABASE_URL ||= process.env.NETLIFY_DATABASE_URL;
+  // Endereço do site: na Netlify, a variável URL já vem preenchida
+  raw.SITE_URL ||= process.env.URL;
+  // Segredo interno derivado da credencial do banco quando não informado (Netlify)
+  if (!raw.APP_SECRET && onNetlify && raw.DATABASE_URL) {
+    raw.APP_SECRET = createHash("sha256").update(`nasil-app-secret:${raw.DATABASE_URL}`).digest("hex");
+  }
+  const parsed = schema.safeParse(raw);
   if (!parsed.success) {
     const issues = parsed.error.issues.map((i) => `  - ${i.path.join(".")}: ${i.message}`).join("\n");
     throw new Error(`Configuração inválida de ambiente:\n${issues}\nVeja .env.example`);

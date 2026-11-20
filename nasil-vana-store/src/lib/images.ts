@@ -14,7 +14,7 @@ import { putObject } from "./storage";
 export const MAX_UPLOAD_BYTES = 15 * 1024 * 1024;
 const ALLOWED = new Set(["jpeg", "png", "webp", "avif", "heif"]);
 /** Em plataformas serverless (Netlify) use IMAGE_MAX_WIDTH=1600 para caber no tempo-limite da função. */
-const MAX_WIDTH = Math.max(640, Number(process.env.IMAGE_MAX_WIDTH) || 2000);
+const MAX_WIDTH = Math.max(640, Number(process.env.IMAGE_MAX_WIDTH) || (process.env.IS_NETLIFY === "1" || process.env.NETLIFY === "true" ? 1600 : 2000));
 const WIDTHS = [320, 480, 640, 960, 1280, 1600, 2000].filter((w) => w <= MAX_WIDTH);
 const MAX_PIXELS = 60_000_000;
 
@@ -29,7 +29,13 @@ export type ProcessedImage = {
   bytes: number;
 };
 
-export async function processAndStoreImage(input: Buffer, opts: { minSize?: number } = {}): Promise<ProcessedImage> {
+export type ImageWriter = (key: string, body: Buffer, contentType: string) => Promise<void>;
+
+export async function processAndStoreImage(
+  input: Buffer,
+  opts: { minSize?: number; key?: string; write?: ImageWriter } = {},
+): Promise<ProcessedImage> {
+  const write = opts.write ?? putObject;
   const minSize = opts.minSize ?? 300;
   if (input.byteLength === 0) throw new ImageValidationError("Arquivo vazio.");
   if (input.byteLength > MAX_UPLOAD_BYTES) throw new ImageValidationError("Imagem maior que 15 MB.");
@@ -57,7 +63,7 @@ export async function processAndStoreImage(input: Buffer, opts: { minSize?: numb
   if (widths.length === 0 || (widths[widths.length - 1] < width * 0.9 && widths[widths.length - 1] < MAX_WIDTH)) widths = [...widths, Math.min(width, MAX_WIDTH)];
   widths = [...new Set(widths)].sort((a, b) => a - b);
 
-  const key = `media/${randomUUID()}`;
+  const key = opts.key ?? `media/${randomUUID()}`;
   let bytes = 0;
   for (const w of widths) {
     const resized = sharp(oriented.data).resize({ width: w, withoutEnlargement: true });
@@ -66,8 +72,8 @@ export async function processAndStoreImage(input: Buffer, opts: { minSize?: numb
       resized.clone().webp({ quality: 78, effort: 4 }).toBuffer(),
     ]);
     bytes += avif.byteLength + webp.byteLength;
-    await putObject(`${key}/${w}.avif`, avif, "image/avif");
-    await putObject(`${key}/${w}.webp`, webp, "image/webp");
+    await write(`${key}/${w}.avif`, avif, "image/avif");
+    await write(`${key}/${w}.webp`, webp, "image/webp");
   }
 
   const blur = await sharp(oriented.data).resize({ width: 16 }).blur(1).webp({ quality: 40 }).toBuffer();

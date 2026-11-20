@@ -3,12 +3,20 @@
  *
  *   npm run db:seed            → só executa se o banco estiver vazio
  *   npm run db:seed -- --reset → APAGA catálogo, conteúdos e pedidos e recria (apenas desenvolvimento)
+ *
+ * As fotos do catálogo inicial são geradas em public/media/... a cada build (arquivos estáticos
+ * servidos pela CDN, com nomes fixos "seed-..."), então funcionam em qualquer hospedagem.
+ * Se ADMIN_EMAIL e ADMIN_PASSWORD estiverem definidas e não houver usuário no painel,
+ * cria a conta da proprietária (troca de senha obrigatória no 1º acesso).
  */
 import sharp from "sharp";
+import { mkdir, writeFile } from "node:fs/promises";
+import path from "node:path";
+import { hashPassword } from "../src/lib/auth/password";
 import { sql as dsql } from "drizzle-orm";
 import { createDb } from "../src/db/client";
 import * as s from "../src/db/schema";
-import { processAndStoreImage } from "../src/lib/images";
+import { processAndStoreImage, type ProcessedImage } from "../src/lib/images";
 import { CROPS } from "./crops";
 import { editorialGrade } from "./grade";
 import { SEED_CATEGORIES, SEED_COLORS, SEED_PRODUCTS, SEED_SIZES } from "./catalog";
@@ -16,12 +24,51 @@ import { FAQ_TEMPLATES, PAGE_TEMPLATES, SIZE_GUIDE_PAGE } from "./pages";
 
 const reset = process.argv.includes("--reset");
 
+/** Grava as variações da foto em public/media/<chave>/ (servidas como arquivos estáticos). */
+const writePublic = async (key: string, body: Buffer) => {
+  const file = path.join("public", "media", key);
+  await mkdir(path.dirname(file), { recursive: true });
+  await writeFile(file, body);
+};
+
+async function buildSeedImages() {
+  const out = new Map<string, ProcessedImage>();
+  for (const c of CROPS) {
+    const buf = await sharp(`seed/originals/${c.src}`)
+      .extract({ left: c.left, top: c.top, width: c.width, height: c.height })
+      .png()
+      .toBuffer();
+    out.set(c.out, await processAndStoreImage(await editorialGrade(buf), {
+      minSize: 150,
+      key: `media/seed-${c.out}`,
+      // Com S3/R2 as fotos vão para o bucket; nos demais casos viram arquivos estáticos do site
+      write: process.env.STORAGE_DRIVER === "s3" ? undefined : writePublic,
+    }));
+    process.stdout.write(".");
+  }
+  console.log(`\n${CROPS.length} fotos do catálogo inicial geradas em public/media`);
+  return out;
+}
+
+async function ensureOwner(db: ReturnType<typeof createDb>["db"]) {
+  const email = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+  const password = process.env.ADMIN_PASSWORD;
+  if (!email || !password) return;
+  const [{ n }] = await db.select({ n: dsql<number>`count(*)::int` }).from(s.adminUsers);
+  if (n > 0) return;
+  if (password.length < 12) throw new Error("ADMIN_PASSWORD precisa ter pelo menos 12 caracteres.");
+  await db.insert(s.adminUsers).values({ email, name: "Proprietária", role: "owner", passwordHash: await hashPassword(password), mustChangePassword: true });
+  console.log(`Conta do painel criada para ${email} (troca de senha obrigatória no 1º acesso).`);
+}
+
 async function main() {
   const { db, sql } = createDb();
   try {
+    const images = await buildSeedImages();
+    await ensureOwner(db);
     const [{ count }] = await db.select({ count: dsql<number>`count(*)::int` }).from(s.products);
     if (count > 0 && !reset) {
-      console.log("Banco já possui produtos. Nada a fazer (use --reset em desenvolvimento).");
+      console.log("Banco já possui produtos: catálogo mantido.");
       return;
     }
     if (reset) {
@@ -34,22 +81,14 @@ async function main() {
     const mediaByCrop = new Map<string, string>();
     const altByCrop = new Map<string, { alt: string; focalY?: number }>();
     for (const p of SEED_PRODUCTS) for (const i of p.images) altByCrop.set(i.crop, { alt: i.alt, focalY: i.focalY });
-
     for (const c of CROPS) {
-      const buf = await sharp(`seed/originals/${c.src}`)
-        .extract({ left: c.left, top: c.top, width: c.width, height: c.height })
-        .png()
-        .toBuffer();
-      const img = await processAndStoreImage(await editorialGrade(buf), { minSize: 150 });
       const meta = altByCrop.get(c.out);
       const [row] = await db
         .insert(s.media)
-        .values({ ...img, alt: meta?.alt ?? c.out, focalY: meta?.focalY ?? 30, originalName: `${c.out}.png` })
+        .values({ ...images.get(c.out)!, alt: meta?.alt ?? c.out, focalY: meta?.focalY ?? 30, originalName: `${c.out}.png` })
         .returning({ id: s.media.id });
       mediaByCrop.set(c.out, row.id);
-      process.stdout.write(".");
     }
-    console.log(`\n${CROPS.length} imagens processadas`);
 
     /* Taxonomia ------------------------------------------------------------ */
     const cats = await db

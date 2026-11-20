@@ -8,3 +8,4 @@ storage/
 *.tsbuildinfo
 next-env.d.ts
 coverage/
+public/media/

@@ -1,6 +1,6 @@
 # Netlify — configure no painel: Base directory = nasil-vana-store
 [build]
-  command = "npm run build"
+  command = "npm run build:netlify"   # cria/atualiza tabelas, catálogo inicial e então compila
   publish = ".next"
 
 [build.environment]

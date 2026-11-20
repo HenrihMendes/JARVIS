@@ -14,9 +14,11 @@
     "db:migrate": "node --env-file-if-exists=.env.local ./node_modules/drizzle-kit/bin.cjs migrate",
     "db:seed": "tsx --env-file-if-exists=.env.local seed/run.ts",
     "admin:create": "tsx --env-file-if-exists=.env.local scripts/create-admin.ts",
-    "orders:expire": "tsx --env-file-if-exists=.env.local scripts/expire-orders.ts"
+    "orders:expire": "tsx --env-file-if-exists=.env.local scripts/expire-orders.ts",
+    "build:netlify": "drizzle-kit migrate && tsx seed/run.ts && next build"
   },
   "dependencies": {
+    "@netlify/blobs": "^11.1.9",
     "@node-rs/argon2": "^2.2.2",
     "aws4fetch": "^1.0.20",
     "drizzle-orm": "^0.45.4",

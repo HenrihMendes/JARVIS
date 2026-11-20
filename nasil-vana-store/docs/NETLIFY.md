@@ -1,72 +1,82 @@
-# Publicação na Netlify
+# Colocar a loja no ar pela Netlify (passo a passo simples)
 
-A Netlify roda Next.js em **funções serverless** (AWS Lambda). Isso muda três coisas em relação a um servidor comum — e o projeto já está ajustado para elas:
+Você vai precisar de: conta no **GitHub** (o código já está lá), conta na **Netlify** e conta no **Neon** (o banco de dados, grátis). Tempo: uns 15 minutos.
 
-| Limitação da Netlify | Consequência | O que já foi feito |
-| --- | --- | --- |
-| Disco das funções é temporário | Fotos enviadas pelo painel **sumiriam** | Use armazenamento S3 (Cloudflare R2) — `STORAGE_DRIVER=s3` |
-| Requisição máx. **6 MB** | Foto de celular não sobe | O painel reduz a foto **no navegador** antes de enviar |
-| Função máx. **10 s** (padrão) | Processar imagem grande estoura o tempo | `IMAGE_MAX_WIDTH=1600` (≈ 2,6 s por foto em 1 núcleo) |
-| Não há “servidor sempre ligado” | Tarefas periódicas precisam de agendamento | `netlify/functions/expirar-pedidos.mts` roda a cada 5 min |
-| Muitas conexões ao banco | Cada função abre a sua | Banco com *pooler* (Neon) + `DATABASE_POOL_MAX=3` |
+O deploy faz sozinho: cria as tabelas, cadastra o catálogo inicial com as fotos e cria o login da dona.
 
-Testado no ambiente de desenvolvimento: `netlify build` com o adaptador oficial (`@netlify/plugin-nextjs` 5.16.6) **compilou o Next 16.4.6 e gerou as funções**. A etapa de empacotar o *proxy* como Edge Function não pôde ser concluída lá (sem acesso à internet para baixar o Deno) — confira no primeiro deploy.
+---
 
-## Passo a passo
+## Parte 1 — Criar o banco de dados (Neon)
 
-### 1. Banco de dados — Neon (PostgreSQL serverless)
-- Crie um projeto em neon.tech (plano gratuito serve para começar) na região **AWS US East (N. Virginia) `us-east-1`** — a mesma região padrão das funções da Netlify (menos latência entre site e banco).
-- Copie a string de conexão **com pooling** (host contém `-pooler`), com `?sslmode=require`.
-- (A Netlify também oferece o “Netlify DB”, que é Neon por baixo; qualquer um serve.)
+1. Entre em **https://neon.tech** e clique em **Sign up** → entre com o GitHub.
+2. Clique em **Create project**.
+   - Nome: `nasil-vana-store`
+   - Região: **AWS US East (N. Virginia)**
+   - Clique em **Create**.
+3. Na tela do projeto, clique em **Connect** (ou “Connection string”).
+4. Deixe ligada a opção **Connection pooling**.
+5. Copie o texto que começa com `postgresql://...` e guarde. Esse é o seu **endereço do banco**.
 
-### 2. Imagens — Cloudflare R2 (10 GB grátis, sem custo de saída)
-- Crie um bucket (ex.: `nasil-media`) e ative o acesso público (domínio `r2.dev` ou, melhor, um subdomínio seu como `cdn.seudominio.com.br`).
-- Crie um token de API com permissão de leitura/escrita **só nesse bucket**.
+---
 
-### 3. Criar tabelas e o catálogo inicial (no seu computador, uma vez)
-```bash
-cd nasil-vana-store
-npm install
-# .env.local com as MESMAS variáveis de produção (DATABASE_URL do Neon, S3_*, STORAGE_DRIVER=s3, APP_SECRET...)
-npm run db:migrate
-npm run db:seed                       # envia as fotos tratadas para o R2
-npm run admin:create -- --email dona@email.com --name "Nome da Dona"   # anote a senha temporária
-```
+## Parte 2 — Criar o site na Netlify
 
-### 4. Site na Netlify
-- **Add new site → Import from Git** → repositório → **Base directory: `nasil-vana-store`** (o resto vem do `netlify.toml`).
-- **Environment variables** (Site configuration → Environment variables):
+1. Entre em **https://app.netlify.com** → **Add new site** → **Import an existing project** → **GitHub**.
+2. Escolha o repositório **jarvis**.
+3. Em **Branch to deploy**, escolha **`claude/nasil-vana-store-ecommerce-2sdded`**.
+4. **Não mexa** em Build command nem em Publish directory (já está configurado).
+5. Clique em **Add environment variables** e crie estas 3:
 
-| Variável | Valor |
+| Key (nome) | Value (valor) |
 | --- | --- |
-| `DATABASE_URL` | string do Neon com `-pooler` e `?sslmode=require` |
-| `DATABASE_POOL_MAX` | `3` |
-| `DATABASE_PREPARE` | `false` (exigido pelo pooler) |
-| `SITE_URL` | `https://www.seudominio.com.br` (ou o `https://xxx.netlify.app` provisório) |
-| `APP_SECRET` | `openssl rand -base64 48` |
-| `STORAGE_DRIVER` | `s3` |
-| `S3_ENDPOINT` | `https://<id-da-conta>.r2.cloudflarestorage.com` |
-| `S3_BUCKET` / `S3_ACCESS_KEY_ID` / `S3_SECRET_ACCESS_KEY` | do token do R2 |
-| `NEXT_PUBLIC_MEDIA_BASE_URL` | URL pública do bucket (ex.: `https://cdn.seudominio.com.br`) |
-| `IMAGE_MAX_WIDTH` | `1600` |
-| `MP_ACCESS_TOKEN` / `MP_WEBHOOK_SECRET` | ver [PAGAMENTOS.md](PAGAMENTOS.md) |
-| `CRON_SECRET` | `openssl rand -base64 32` |
-| `RESEND_API_KEY` / `EMAIL_FROM` | opcional (e-mails de pedido) |
+| `DATABASE_URL` | o endereço do banco copiado do Neon |
+| `ADMIN_EMAIL` | o e-mail que a dona vai usar para entrar no painel |
+| `ADMIN_PASSWORD` | uma senha provisória com **12 caracteres ou mais** |
 
-> Marque as variáveis secretas como *secret* na Netlify. `NEXT_PUBLIC_MEDIA_BASE_URL` precisa existir **antes** do build.
+6. Clique em **Deploy**. Espere uns 2–3 minutos até aparecer **Published**.
 
-- Faça o deploy. Depois, em **Domain management**, conecte o domínio (o HTTPS é automático) e atualize `SITE_URL` + redeploy.
+---
 
-### 5. Mercado Pago
-Cadastre o webhook `https://www.seudominio.com.br/api/webhooks/mercadopago` (evento **Pagamentos**). Faça uma compra de teste completa antes de anunciar.
+## Parte 3 — Testar
 
-### 6. Conferência pós-deploy
-- [ ] Home, produto e checkout abrem (e o `/admin` pede login)
-- [ ] Enviar uma foto pelo painel e vê-la na loja (testa R2 + limite de 6 MB + tempo da função)
-- [ ] Compra de teste aprovada vira “Pagamento aprovado” no painel (testa webhook)
-- [ ] Em **Logs → Functions**, a função `expirar-pedidos` aparece rodando a cada 5 min
+1. Abra o endereço que a Netlify mostrou (algo como `https://nome-aleatorio.netlify.app`). A loja tem que aparecer com as fotos.
+2. Abra o mesmo endereço com **`/admin`** no final.
+3. Entre com o `ADMIN_EMAIL` e a `ADMIN_PASSWORD`. O painel vai pedir uma senha nova — crie uma senha forte. A senha provisória deixa de valer.
 
-## Custos e pontos de atenção (seja realista)
-- A Netlify passou a cobrar por **créditos** (deploys, banda e execuções de função consomem créditos). O plano gratuito tem um limite mensal de créditos; uma loja pequena com tráfego vindo do Instagram tende a caber no começo, mas **acompanhe o consumo** em *Usage* — se estourar, o site pode ser pausado até o mês seguinte ou exigir o plano Pro.
-- Todas as páginas da loja são renderizadas por requisição (preço e estoque sempre atualizados), então cada visita usa execução de função. Uma VPS ([DEPLOY.md](DEPLOY.md)) tem custo fixo e não tem esses limites.
-- As funções ficam nos EUA; para quem está em Sinop isso soma ~150 ms por página. Aceitável, mas um servidor no Brasil seria mais rápido.
+Pronto: o site está no ar. **Ainda não vende**: faltam as 2 etapas abaixo.
+
+---
+
+## Depois (quando tiver os dados da dona)
+
+**Dados da loja e frete — no próprio painel, sem programador:**
+- Painel → **Configurações**: razão social, CNPJ, WhatsApp, e-mail, Instagram, endereço.
+- Painel → **Frete**: ativar retirada na loja / entrega em Sinop e definir os valores.
+- Painel → **Produtos**: conferir estoque real e fotos.
+
+**Pagamento (Mercado Pago) — na Netlify:**
+1. Siga [PAGAMENTOS.md](PAGAMENTOS.md) para pegar o **Access Token** e a **assinatura secreta**.
+2. Netlify → seu site → **Site configuration → Environment variables** → adicione `MP_ACCESS_TOKEN`, `MP_WEBHOOK_SECRET` e `CRON_SECRET` (qualquer frase longa e aleatória).
+3. **Deploys → Trigger deploy → Deploy site** (variável nova só vale depois de um novo deploy).
+
+**Domínio próprio (ex.: www.nasilvanastore.com.br):** Netlify → **Domain management → Add a domain** e siga as instruções. O HTTPS é automático. Depois adicione a variável `SITE_URL` com `https://www.seudominio.com.br` e faça um novo deploy.
+
+---
+
+## Se der erro
+
+- **O deploy falhou**: Netlify → Deploys → clique no deploy com erro → leia as últimas linhas do log. O erro mais comum é `DATABASE_URL` copiada errada (faltando pedaço).
+- **A loja abre mas dá erro na página**: confira se as variáveis foram criadas e faça **Trigger deploy**.
+- **Esqueceu a senha do painel**: no Neon, abra **SQL Editor** e rode `DELETE FROM admin_sessions; DELETE FROM admin_users;`. Faça um novo deploy: o login é recriado a partir de `ADMIN_EMAIL`/`ADMIN_PASSWORD`.
+
+---
+
+## Detalhes técnicos (para quem for dar manutenção)
+
+- Comando de build: `npm run build:netlify` = `drizzle-kit migrate` + `seed/run.ts` (só popula se o banco estiver vazio) + `next build`.
+- Fotos enviadas pelo painel ficam no **Netlify Blobs** (armazenamento da própria Netlify) e são cacheadas na CDN. As fotos do catálogo inicial são geradas a cada build como arquivos estáticos (`public/media/media/seed-*`).
+- Padrões automáticos na Netlify: `SITE_URL` = URL do site, `APP_SECRET` derivado do `DATABASE_URL` se não informado, pool de 3 conexões, sem *prepared statements* (compatível com o pooler do Neon), fotos até 1600 px.
+- Limites da plataforma já tratados: requisição ≤ 6 MB (foto reduzida no navegador), função ≤ 10 s (processamento ≈ 2,6 s/foto), disco temporário (Blobs).
+- Função agendada `netlify/functions/expirar-pedidos.mts` (a cada 5 min, exige `CRON_SECRET`).
+- Custos: a Netlify cobra por créditos; cada visita executa função (preço/estoque ao vivo). Acompanhe em **Usage**. Funções nos EUA (~150 ms a mais para Sinop).
+- Validado localmente: banco vazio → build cria tudo → login com troca de senha obrigatória → segundo build não duplica nada. Não validado: execução real na Netlify e o Netlify Blobs (dependem da conta).

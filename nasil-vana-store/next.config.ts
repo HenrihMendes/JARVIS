@@ -43,6 +43,11 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Valores conhecidos no build e embutidos no servidor (as funções da Netlify não recebem as variáveis do build)
+  env: {
+    IS_NETLIFY: process.env.NETLIFY === "true" ? "1" : "",
+    SITE_URL: process.env.SITE_URL || process.env.URL || "http://localhost:3000",
+  },
   cacheComponents: true,
   partialPrefetching: true,
   // Docker/VPS usa o servidor "standalone"; na Netlify o adaptador oficial cuida do empacotamento.
