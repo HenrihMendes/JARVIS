@@ -34,9 +34,16 @@ export function Header({
     const onScroll = () => {
       const y = window.scrollY;
       setScrolled(y > 8);
-      setHidden(y > 240 && y > lastY.current + 4);
-      if (y < lastY.current - 4) setHidden(false);
-      lastY.current = y;
+      // Só decide após um deslocamento claro (evita o "pisca-pisca" com rolagem suave):
+      // descendo → esconde; subindo → mostra; perto do topo → sempre visível.
+      const delta = y - lastY.current;
+      if (y < 120) {
+        setHidden(false);
+        lastY.current = y;
+      } else if (Math.abs(delta) > 12) {
+        setHidden(delta > 0);
+        lastY.current = y;
+      }
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -60,7 +67,7 @@ export function Header({
       <header
         className={`sticky top-0 z-40 transition-[transform,background-color,box-shadow] duration-500 ease-[var(--ease-editorial)] ${
           hidden && !menu ? "-translate-y-full" : "translate-y-0"
-        } ${scrolled ? "bg-paper/92 shadow-[0_1px_0_var(--color-line)] backdrop-blur-md" : "bg-paper"}`}
+        } ${scrolled ? "bg-paper shadow-[0_1px_0_var(--color-line)]" : "bg-paper"}`}
       >
         <a href="#conteudo" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-50 focus:bg-ink focus:px-4 focus:py-2 focus:text-paper">
           Pular para o conteúdo
@@ -97,7 +104,7 @@ export function Header({
 
           {/* Centro */}
           <Link href="/" aria-label="Nasil Vana Store — página inicial" className="group flex items-center justify-center">
-            <Logo variant="full" className="h-8 sm:h-9 lg:h-10" />
+            <Logo variant="full-small" className="h-10 lg:h-11" />
           </Link>
 
           {/* Direita */}
@@ -246,7 +253,7 @@ export function HeaderShell() {
       <div className="mx-auto grid h-[var(--header-h)] max-w-[1600px] grid-cols-[1fr_auto_1fr] items-center px-[var(--gutter)]">
         <span />
         <Link href="/" aria-label="Nasil Vana Store — página inicial" className="flex items-center justify-center">
-          <Logo variant="full" className="h-8 sm:h-9 lg:h-10" />
+          <Logo variant="full-small" className="h-10 lg:h-11" />
         </Link>
         <span />
       </div>

@@ -5,7 +5,10 @@ import { LOGO_MONO } from "./logo-paths";
  * Logotipo oficial vetorizado. Usamos máscara CSS para herdar a cor do texto
  * (preto sobre papel, papel sobre foto) mantendo o arquivo SVG em cache do navegador.
  */
-const RATIOS = { full: 4206 / 1214, word: 2490 / 1200 } as const;
+// "full-small": versão para tamanhos pequenos (cabeçalho), com traços levemente afinados para
+// abrir o interior de letras como "a", "o" e "s", que fechavam em telas pequenas.
+const RATIO_SMALL = 4167 / 1204;
+const RATIOS = { full: 4206 / 1214, word: 2490 / 1200, "full-small": RATIO_SMALL } as const;
 
 export function Logo({
   variant = "word",
@@ -13,7 +16,7 @@ export function Logo({
   style,
   title = "Nasil Vana Store",
 }: {
-  variant?: "full" | "word";
+  variant?: "full" | "word" | "full-small";
   className?: string;
   style?: CSSProperties;
   title?: string;

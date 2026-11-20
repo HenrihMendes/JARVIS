@@ -171,7 +171,7 @@ export async function CatalogView({ base, filters, emptyHint }: { base: string; 
   return (
     <div className="mx-auto max-w-[1600px] px-[var(--gutter)]">
       {/* Barra de ferramentas */}
-      <div className="sticky top-[var(--header-h)] z-20 -mx-[var(--gutter)] flex items-center justify-between gap-4 border-y border-line bg-paper/95 px-[var(--gutter)] py-3 backdrop-blur">
+      <div className="relative z-20 -mx-[var(--gutter)] flex items-center justify-between gap-4 border-y border-line bg-paper px-[var(--gutter)] py-3">
         <div className="flex items-center gap-3">
           <MobileFilters count={active}>{filterPanel}</MobileFilters>
           <p className="text-[0.8125rem] text-stone" aria-live="polite">
