@@ -10,3 +10,7 @@
 [functions]
   # sharp e argon2 têm binários nativos: não empacotar com esbuild
   external_node_modules = ["sharp", "@node-rs/argon2"]
+
+# Adaptador oficial do Next.js na Netlify (declarado explicitamente: sem ele o site publica só arquivos soltos e dá 404)
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
