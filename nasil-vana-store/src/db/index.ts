@@ -13,7 +13,9 @@ const sql =
     idle_timeout: 20,
     connect_timeout: 10,
     prepare: env.DATABASE_PREPARE,
-    ssl: env.DATABASE_SSL ? "require" : false,
+    // Só força SSL quando pedido; caso contrário vale o "sslmode" da própria URL (ex.: Neon exige sslmode=require).
+    // Passar ssl:false aqui anularia o sslmode da URL.
+    ...(env.DATABASE_SSL ? { ssl: "require" as const } : {}),
     onnotice: () => {},
   });
 
