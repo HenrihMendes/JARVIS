@@ -146,10 +146,14 @@ function card(d){
 
   const row = el("div",{class:"row"});
   if ((d.status === "fila" || useFup) && d.telefone){
-    const a = el("a",{class:"btn primary",target:"_blank",rel:"noopener",href:"#",text: useFup ? "Abrir follow-up no WhatsApp" : "Abrir no WhatsApp"});
-    a.addEventListener("click", () => { a.href = "https://wa.me/"+d.telefone+"?text="+encodeURIComponent(ta.value); asking = {id:d.id, fup:useFup}; setTimeout(render, 400); });
+    const waUrl = () => "https://api.whatsapp.com/send?phone="+d.telefone+"&text="+encodeURIComponent(ta.value);
+    const a = el("a",{class:"btn primary",target:"_blank",rel:"noopener",href:waUrl(),text: useFup ? "Abrir follow-up no WhatsApp" : "Abrir no WhatsApp"});
+    ta.addEventListener("input", () => { a.href = waUrl(); });
+    a.addEventListener("click", () => { asking = {id:d.id, fup:useFup}; setTimeout(render, 1500); });
     row.append(a);
-    row.append(el("button",{class:"btn line",text:"Copiar",onclick:async e => { try { await navigator.clipboard.writeText(ta.value); e.target.textContent="Copiado"; } catch(_) { ta.select(); } }}));
+    row.append(el("button",{class:"btn line",text:"Copiar número",onclick:async e => { try { await navigator.clipboard.writeText(d.telefone.replace(/^55/,"")); e.target.textContent="Número copiado"; } catch(_) {} }}));
+    row.append(el("button",{class:"btn line",text:"Copiar mensagem",onclick:async e => { try { await navigator.clipboard.writeText(ta.value); e.target.textContent="Mensagem copiada"; } catch(_) { ta.select(); } }}));
+    row.append(el("button",{class:"btn line",text:"Já enviei",onclick:()=>{ asking = {id:d.id, fup:useFup}; render(); }}));
   }
   if (d.status !== "fila") {
     for (const [s,lbl] of [["respondeu","Respondeu"],["reuniao","Reunião"],["fechado","Fechou"],["descartado","Descartar"]])
