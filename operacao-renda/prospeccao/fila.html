@@ -1,0 +1,215 @@
+<title>Fila de Prospecção</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap">
+<style>
+/* Layout: uma coluna de cartões, barra de abas fixa no topo, pensada para o polegar no celular */
+:root{
+  --bg:#f4f6f5; --surface:#ffffff; --fg:#17201d; --mute:#5d6b66; --line:#dde4e1;
+  --accent:#12705a; --accent-ink:#ffffff; --accent-soft:#e2f1ec;
+  --warn:#9a5a12; --warn-soft:#fbefdf; --ok:#1d6b2f; --ok-soft:#e3f2e6; --bad:#8a2e2e; --bad-soft:#f6e4e4;
+  --f-display:"Space Grotesk",ui-sans-serif,system-ui,sans-serif;
+  --f-body:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1513; --surface:#18211e; --fg:#e6eeeb; --mute:#97a6a0; --line:#2a3632;
+  --accent:#4fbf9f; --accent-ink:#06231b; --accent-soft:#1c3a31;
+  --warn:#e3a55a; --warn-soft:#3a2c18; --ok:#7fd193; --ok-soft:#1b3322; --bad:#e89a9a; --bad-soft:#3a2020; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1513; --surface:#18211e; --fg:#e6eeeb; --mute:#97a6a0; --line:#2a3632;
+  --accent:#4fbf9f; --accent-ink:#06231b; --accent-soft:#1c3a31;
+  --warn:#e3a55a; --warn-soft:#3a2c18; --ok:#7fd193; --ok-soft:#1b3322; --bad:#e89a9a; --bad-soft:#3a2020; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--f-body)}
+.wrap{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 48px;display:grid;gap:14px}
+h1{font:600 22px/1.2 var(--f-display);margin:0;text-wrap:balance}
+.sub{color:var(--mute);margin:2px 0 0;font-size:13px}
+.meta{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.meta div{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-width:0}
+.meta b{display:block;font:600 20px/1.1 var(--f-display);font-variant-numeric:tabular-nums}
+.meta span{font-size:12px;color:var(--mute)}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden}.bar i{display:block;height:100%;background:var(--accent);width:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;gap:6px;overflow-x:auto;padding-block:6px}
+.tabs button{flex:0 0 auto;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:999px;padding:6px 12px;font:500 14px var(--f-body);cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.tabs .n{font-variant-numeric:tabular-nums;opacity:.7;margin-left:4px}
+.me{display:flex;gap:8px;align-items:end;background:var(--warn-soft);border-radius:8px;padding:10px 12px;flex-wrap:wrap}
+.me label{font-size:13px;flex:1 1 200px}
+input,textarea{width:100%;font:inherit;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:8px}
+textarea{min-height:120px;resize:vertical}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;display:grid;gap:10px;min-width:0}
+.top{display:flex;justify-content:space-between;gap:10px;align-items:start}
+.top h2{font:600 17px/1.25 var(--f-display);margin:0}
+.seg{font-size:12px;color:var(--mute)}
+.score{font:600 13px var(--f-display);font-variant-numeric:tabular-nums;background:var(--accent-soft);color:var(--accent);border-radius:6px;padding:2px 7px;white-space:nowrap}
+.pill{display:inline-block;font-size:12px;font-weight:600;border-radius:999px;padding:2px 9px}
+.st-fila{background:var(--line);color:var(--fg)} .st-enviado{background:var(--accent-soft);color:var(--accent)}
+.st-respondeu,.st-reuniao{background:var(--warn-soft);color:var(--warn)} .st-fechado{background:var(--ok-soft);color:var(--ok)} .st-descartado{background:var(--bad-soft);color:var(--bad)}
+.facts{font-size:13px;color:var(--mute);display:grid;gap:2px}
+.facts a{color:var(--accent)}
+.hook{font-size:13px;border-left:3px solid var(--accent);padding-left:8px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:0;border-radius:8px;padding:10px 14px;font:600 14px var(--f-body);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.btn.primary{background:var(--accent);color:var(--accent-ink);flex:1 1 180px}
+.btn.soft{background:var(--accent-soft);color:var(--accent)}
+.btn.line{background:transparent;border:1px solid var(--line);color:var(--fg)}
+.btn:focus-visible,.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.ask{background:var(--warn-soft);border-radius:8px;padding:10px;display:grid;gap:8px;font-size:14px}
+.tel{font-variant-numeric:tabular-nums;user-select:all}
+.empty,.note{color:var(--mute);font-size:14px;text-align:center;padding:20px 8px}
+details summary{cursor:pointer;color:var(--mute);font-size:13px}
+@media (prefers-reduced-motion:no-preference){.bar i{transition:width .3s}}
+@media (max-width:420px){.meta{grid-template-columns:repeat(2,1fr)}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Fila de Prospecção</h1>
+    <p class="sub">Programa de Retorno · Sinop-MT · você confere e envia, do seu WhatsApp</p>
+  </header>
+
+  <section class="meta" aria-label="Resumo">
+    <div><b id="kHoje">0/10</b><span>enviados hoje</span><div class="bar"><i id="kBar"></i></div></div>
+    <div><b id="kFup">0</b><span>follow-ups vencidos</span></div>
+    <div><b id="kConv">0</b><span>em conversa</span></div>
+    <div><b id="kFech">0</b><span>fechados</span></div>
+  </section>
+
+  <section class="me" id="meBox" hidden>
+    <label for="meNome">Seu primeiro nome (entra nas mensagens)<input id="meNome" autocomplete="given-name" placeholder="Ex.: Pedro"></label>
+    <button class="btn primary" id="meSave" style="flex:0 0 auto">Salvar</button>
+  </section>
+
+  <nav class="tabs" id="tabs" aria-label="Filtros"></nav>
+  <p class="note" id="status">Carregando a fila…</p>
+  <div id="list" style="display:grid;gap:12px"></div>
+  <p class="note">Antes de enviar, abra o Instagram ou o Google da clínica e confira se ela está ativa. Máximo de 2 tentativas sem resposta.</p>
+</div>
+
+<script>
+const META_DIA = 10;
+const TABS = [
+  ["hoje","Hoje"],["followup","Follow-up"],["conversa","Em conversa"],["fechado","Fechados"],["todos","Todos"]
+];
+let docs = [], perfil = {}, tab = "hoje", db = null, asking = null;
+try { tab = localStorage.getItem("fila_tab") || "hoje"; } catch(e) {}
+
+const $ = s => document.querySelector(s);
+const el = (tag, attrs = {}, ...kids) => { const n = document.createElement(tag);
+  for (const [k,v] of Object.entries(attrs)) { if (k === "class") n.className = v; else if (k === "text") n.textContent = v; else if (k.startsWith("on")) n.addEventListener(k.slice(2), v); else n.setAttribute(k, v); }
+  kids.flat().forEach(c => c != null && n.append(c)); return n; };
+const dayKey = d => { const x = new Date(d); return x.getFullYear()+"-"+(x.getMonth()+1)+"-"+x.getDate(); };
+const today = dayKey(Date.now());
+const daysSince = iso => iso ? (Date.now() - new Date(iso).getTime()) / 864e5 : null;
+const fill = t => (t || "").replaceAll("{eu}", perfil.nome || "[seu nome]");
+const isHttps = u => typeof u === "string" && /^https:\/\//.test(u);
+const STATUS = { fila:"Na fila", enviado:"Enviado", respondeu:"Respondeu", reuniao:"Reunião marcada", fechado:"Fechado", descartado:"Descartado" };
+
+function fupDue(d){ return d.status === "enviado" && !d.followupEm && daysSince(d.enviadoEm) >= 2; }
+function inTab(d){
+  if (tab === "hoje") return d.status === "fila";
+  if (tab === "followup") return fupDue(d);
+  if (tab === "conversa") return d.status === "respondeu" || d.status === "reuniao";
+  if (tab === "fechado") return d.status === "fechado";
+  return true;
+}
+
+async function save(id, patch){
+  const d = docs.find(x => x.id === id); if (!d || !db) return;
+  Object.assign(d, patch); render();
+  try { await db.collection("prospects").doc(id).update(patch); }
+  catch(e){ $("#status").hidden = false; $("#status").textContent = "Não consegui salvar agora. Confira a conexão e toque de novo."; }
+}
+
+function card(d){
+  const c = el("article", { class:"card" });
+  c.append(el("div",{class:"top"},
+    el("div",{}, el("h2",{text:d.nome}), el("div",{class:"seg",text:d.segmento + (d.endereco ? " · " + d.endereco : "")})),
+    el("span",{class:"score",title:"Prioridade (0–100)",text:String(d.score)})));
+  c.append(el("div",{}, el("span",{class:"pill st-"+d.status,text:STATUS[d.status]||d.status}),
+    d.enviadoEm ? el("span",{class:"seg",text:"  enviado em "+new Date(d.enviadoEm).toLocaleDateString("pt-BR")}) : null));
+
+  const facts = el("div",{class:"facts"});
+  if (d.telefone) facts.append(el("div",{}, "WhatsApp: ", el("span",{class:"tel",text:d.telefoneTxt||d.telefone})));
+  else if (d.telefoneTxt) facts.append(el("div",{}, "Telefone fixo (ligue): ", el("span",{class:"tel",text:d.telefoneTxt})));
+  else facts.append(el("div",{text:"Sem telefone público: visita presencial no endereço."}));
+  if (isHttps(d.link)) facts.append(el("div",{}, el("a",{href:d.link,target:"_blank",rel:"noopener",text:"Conferir "+(d.linkTipo||"perfil")+" ↗"})));
+  if (d.fonte) facts.append(el("div",{text:"Fonte: "+d.fonte}));
+  c.append(facts);
+  if (d.gancho) c.append(el("div",{class:"hook",text:"Por que ela: "+d.gancho}));
+
+  const useFup = d.status === "enviado" && fupDue(d);
+  const msgTxt = fill(useFup ? d.followup : d.mensagem);
+  const ta = el("textarea",{id:"m_"+d.id,"aria-label":"Mensagem para "+d.nome}); ta.value = msgTxt;
+  if (d.status === "fila" || useFup) c.append(ta);
+
+  const row = el("div",{class:"row"});
+  if ((d.status === "fila" || useFup) && d.telefone){
+    const a = el("a",{class:"btn primary",target:"_blank",rel:"noopener",href:"#",text: useFup ? "Abrir follow-up no WhatsApp" : "Abrir no WhatsApp"});
+    a.addEventListener("click", () => { a.href = "https://wa.me/"+d.telefone+"?text="+encodeURIComponent(ta.value); asking = {id:d.id, fup:useFup}; setTimeout(render, 400); });
+    row.append(a);
+    row.append(el("button",{class:"btn line",text:"Copiar",onclick:async e => { try { await navigator.clipboard.writeText(ta.value); e.target.textContent="Copiado"; } catch(_) { ta.select(); } }}));
+  }
+  if (d.status !== "fila") {
+    for (const [s,lbl] of [["respondeu","Respondeu"],["reuniao","Reunião"],["fechado","Fechou"],["descartado","Descartar"]])
+      if (d.status !== s) row.append(el("button",{class:"btn soft",text:lbl,onclick:()=>save(d.id,{status:s,[s+"Em"]:new Date().toISOString()})}));
+  } else row.append(el("button",{class:"btn line",text:"Pular",onclick:()=>save(d.id,{status:"descartado",descartadoEm:new Date().toISOString(),notas:(d.notas||"")+" [pulado]"})}));
+  c.append(row);
+
+  if (asking && asking.id === d.id){
+    c.append(el("div",{class:"ask"}, el("div",{text: asking.fup ? "Você enviou o follow-up?" : "Você enviou a mensagem?"}),
+      el("div",{class:"row"},
+        el("button",{class:"btn primary",text:"Sim, enviei",onclick:()=>{ const f=asking.fup; asking=null; save(d.id, f ? {followupEm:new Date().toISOString()} : {status:"enviado",enviadoEm:new Date().toISOString(),mensagemEnviada:ta.value}); }}),
+        el("button",{class:"btn line",text:"Ainda não",onclick:()=>{ asking=null; render(); }}))));
+  }
+
+  const notes = el("textarea",{id:"n_"+d.id,"aria-label":"Anotações","placeholder":"Anotações: o que respondeu, dia da reunião…",style:"min-height:60px"});
+  notes.value = d.notas || "";
+  notes.addEventListener("change", () => save(d.id,{notas:notes.value}));
+  c.append(el("details",{}, el("summary",{text: d.notas ? "Anotações ✎" : "Anotações"}), notes));
+  return c;
+}
+
+function render(){
+  const sentToday = docs.filter(d => d.enviadoEm && dayKey(d.enviadoEm) === today).length;
+  $("#kHoje").textContent = sentToday + "/" + META_DIA;
+  $("#kBar").style.width = Math.min(100, sentToday / META_DIA * 100) + "%";
+  $("#kFup").textContent = docs.filter(fupDue).length;
+  $("#kConv").textContent = docs.filter(d => d.status === "respondeu" || d.status === "reuniao").length;
+  $("#kFech").textContent = docs.filter(d => d.status === "fechado").length;
+  $("#meBox").hidden = !!perfil.nome || !db;
+
+  const tabs = $("#tabs"); tabs.replaceChildren();
+  for (const [k,l] of TABS){
+    const saved = tab; tab = k; const n = docs.filter(inTab).length; tab = saved;
+    tabs.append(el("button",{"aria-pressed":String(tab===k),onclick:()=>{ tab=k; try{localStorage.setItem("fila_tab",k)}catch(e){} render(); }}, l, el("span",{class:"n",text:String(n)})));
+  }
+  const focusId = document.activeElement && document.activeElement.id;
+  const list = $("#list"); list.replaceChildren();
+  let items = docs.filter(inTab).sort((a,b) => (a.ordem||999) - (b.ordem||999));
+  if (tab === "hoje") items = items.slice(0, Math.max(0, META_DIA - sentToday) || 0);
+  if (!items.length && docs.length){
+    list.append(el("p",{class:"empty",text: tab==="hoje" && sentToday>=META_DIA ? "Meta de hoje cumprida. Volte amanhã ou responda quem está em conversa." : "Nada aqui por enquanto."}));
+  }
+  items.forEach(d => list.append(card(d)));
+  if (focusId){ const f = document.getElementById(focusId); if (f) f.focus(); }
+}
+
+(async () => {
+  const timer = setTimeout(() => { if (!docs.length) $("#status").textContent = "Não consegui carregar a fila ainda. Verifique a conexão."; }, 10000);
+  db = await (window.claude?.use ? window.claude.use("db") : null);
+  if (!db){ clearTimeout(timer); $("#status").textContent = "Entre na sua conta do Claude para ver a fila."; return; }
+  db.collection("prospects").onSnapshot(snap => {
+    docs = snap.docs.map(s => ({ id:s.id, ...s.data() }));
+    if (!snap.metadata.fromCache){ clearTimeout(timer); $("#status").hidden = true; }
+    if (!docs.length){ $("#status").hidden = false; $("#status").textContent = "A fila está vazia. Peça ao Claude para carregar novos prospects."; }
+    render();
+  }, () => { clearTimeout(timer); $("#status").textContent = "A fila parou de atualizar. Recarregue a página."; });
+  db.doc("config/perfil").onSnapshot(s => { perfil = s.exists ? s.data() : {}; render(); }, () => {});
+  $("#meSave").addEventListener("click", async () => {
+    const v = $("#meNome").value.trim(); if (!v) return;
+    try { await db.doc("config/perfil").set({ nome: v }); } catch(e) { $("#status").hidden=false; $("#status").textContent = "Não consegui salvar seu nome."; }
+  });
+})();
+</script>
